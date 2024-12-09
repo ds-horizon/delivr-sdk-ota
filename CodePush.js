@@ -31,7 +31,7 @@ async function checkForUpdate(deploymentKey = null, handleBinaryVersionMismatchC
   const sdk = getPromisifiedSdk(requestFetchAdapter, config);
 
   //initialize events sdk here
-  const pluggerEventSdk = await initializeEventsPlugin();
+  //const pluggerEventSdk = await initializeEventsPlugin();
 
   // Use dynamically overridden getCurrentPackage() during tests.
   const localPackage = await module.exports.getCurrentPackage();
