@@ -4,6 +4,7 @@ import requestFetchAdapter from "./request-fetch-adapter";
 import { AppState, Platform } from "react-native";
 import log from "./logging";
 import hoistStatics from 'hoist-non-react-statics';
+import { initializeEventsPlugin } from "./initPlugger";
 
 let NativeCodePush = require("react-native").NativeModules.CodePush;
 const PackageMixins = require("./package-mixins")(NativeCodePush);
@@ -28,6 +29,9 @@ async function checkForUpdate(deploymentKey = null, handleBinaryVersionMismatchC
    */
   const config = deploymentKey ? { ...nativeConfig, ...{ deploymentKey } } : nativeConfig;
   const sdk = getPromisifiedSdk(requestFetchAdapter, config);
+
+  //initialize events sdk here
+  const pluggerEventSdk = await initializeEventsPlugin();
 
   // Use dynamically overridden getCurrentPackage() during tests.
   const localPackage = await module.exports.getCurrentPackage();
@@ -193,6 +197,8 @@ async function tryReportStatus(statusReport, retryOnAppResume) {
       }
 
       const sdk = getPromisifiedSdk(requestFetchAdapter, config);
+      
+
       await sdk.reportStatusDeploy(/* deployedPackage */ null, /* status */ null, previousLabelOrAppVersion, previousDeploymentKey);
     } else {
       const label = statusReport.package.label;
