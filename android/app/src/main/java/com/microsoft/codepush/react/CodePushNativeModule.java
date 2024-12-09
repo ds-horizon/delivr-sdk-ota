@@ -119,10 +119,11 @@ public class CodePushNativeModule extends ReactContextBaseJavaModule {
             } else {
                 latestJSBundleLoader = JSBundleLoader.createFileLoader(latestJSBundleFile);
             }
-
+            CodePushUtils.log("Bundle is loaded");
             Field bundleLoaderField = instanceManager.getClass().getDeclaredField("mBundleLoader");
             bundleLoaderField.setAccessible(true);
             bundleLoaderField.set(instanceManager, latestJSBundleLoader);
+            CodePushUtils.log("Bundle is set");
         } catch (Exception e) {
             CodePushUtils.log("Unable to set JSBundle - CodePush may not support this version of React Native");
             throw new IllegalAccessException("Could not setJSBundle");
@@ -147,6 +148,7 @@ public class CodePushNativeModule extends ReactContextBaseJavaModule {
             }
 
             String latestJSBundleFile = mCodePush.getJSBundleFileInternal(mCodePush.getAssetsBundleFileName());
+            CodePushUtils.log("latest JS Bundle File "+ latestJSBundleFile);
 
             // #2) Update the locally stored JS bundle file path
             setJSBundle(instanceManager, latestJSBundleFile);
@@ -163,6 +165,7 @@ public class CodePushNativeModule extends ReactContextBaseJavaModule {
 
                         instanceManager.recreateReactContextInBackground();
                         mCodePush.initializeUpdateAfterRestart();
+                        CodePushUtils.log("Initiliase Update and Restart ");
                     } catch (Exception e) {
                         // The recreation method threw an unknown exception
                         // so just simply fallback to restarting the Activity (if it exists)

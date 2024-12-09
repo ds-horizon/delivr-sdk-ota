@@ -249,7 +249,7 @@ public class CodePush implements ReactPackage {
     public String getJSBundleFileInternal(String assetsBundleFileName) {
         this.mAssetsBundleFileName = assetsBundleFileName;
         String binaryJsBundleUrl = CodePushConstants.ASSETS_BUNDLE_PREFIX + assetsBundleFileName;
-
+        CodePushUtils.log("Binary JS Bundle URL "+ binaryJsBundleUrl + " and assetBundleFileName " + assetsBundleFileName);
         String packageFilePath = null;
         try {
             packageFilePath = mUpdateManager.getCurrentPackageBundlePath(this.mAssetsBundleFileName);
@@ -258,16 +258,17 @@ public class CodePush implements ReactPackage {
             CodePushUtils.log(e.getMessage());
             clearUpdates();
         }
-
+        CodePushUtils.log("packageFilePath "+ packageFilePath);
         if (packageFilePath == null) {
             // There has not been any downloaded updates.
             CodePushUtils.logBundleUrl(binaryJsBundleUrl);
             sIsRunningBinaryVersion = true;
             return binaryJsBundleUrl;
         }
-
+        CodePushUtils.log("log Bundle Url because no downloaded update "+ packageFilePath);
         JSONObject packageMetadata = this.mUpdateManager.getCurrentPackage();
         if (isPackageBundleLatest(packageMetadata)) {
+            CodePushUtils.log("log Bundle Url because package is latest "+ packageFilePath);
             CodePushUtils.logBundleUrl(packageFilePath);
             sIsRunningBinaryVersion = false;
             return packageFilePath;
@@ -277,7 +278,7 @@ public class CodePush implements ReactPackage {
             if (!this.mIsDebugMode || hasBinaryVersionChanged(packageMetadata)) {
                 this.clearUpdates();
             }
-
+            CodePushUtils.log("log Bundle Url because binary version is latest "+ packageFilePath);
             CodePushUtils.logBundleUrl(binaryJsBundleUrl);
             sIsRunningBinaryVersion = true;
             return binaryJsBundleUrl;
