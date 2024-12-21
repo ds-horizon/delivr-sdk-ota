@@ -212,6 +212,10 @@ public class CodePushUtils {
         Log.e(CodePushConstants.REACT_NATIVE_LOG_TAG, "[CodePush] Exception", tr);
     }
 
+    public static void log(String message, JSONObject jsonObject) {
+        Log.d(CodePushConstants.REACT_NATIVE_LOG_TAG, "[DS-CodePush] " + message + " " + (jsonObject != null ? jsonObject.toString() : "null"));
+    }
+
     public static void logBundleUrl(String path) {
         log("Loading JS bundle from \"" + path + "\"");
     }

@@ -91,8 +91,8 @@ public class CodePush implements ReactPackage {
     public CodePush(String deploymentKey, Context context, boolean isDebugMode, String serverUrl) {
         this(deploymentKey, context, isDebugMode);
         mServerUrl = serverUrl;
-        Console.log("deploymentKey initialized :: "+ deploymentKey);
-        Console.log("mServerUrl initialized :: "+ mServerUrl);
+        CodePushUtils.log("deploymentKey initialized :: "+ deploymentKey);
+        CodePushUtils.log("mServerUrl initialized :: "+ mServerUrl);
     }
 
     public CodePush(String deploymentKey, Context context, boolean isDebugMode, int publicKeyResourceDescriptor) {
@@ -400,7 +400,7 @@ public class CodePush implements ReactPackage {
 
     private void rollbackPackage() {
         JSONObject failedPackage = mUpdateManager.getCurrentPackage();
-        CodepushUtils.log("failedPackage in Rollback package ::", failedPackage);
+        CodePushUtilsushUtils.log("failedPackage in Rollback package ::", failedPackage);
         mSettingsManager.saveFailedUpdate(failedPackage);
         mUpdateManager.rollbackPackage();
         mSettingsManager.removePendingUpdate();
