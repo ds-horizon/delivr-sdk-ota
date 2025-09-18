@@ -78,7 +78,7 @@ We try our best to maintain backwards compatibility of our plugin with previous 
 | v0.65-v0.70             | v7.0+ *(RN updated iPhone-target-version)*            |
 | v0.71                   | v8.0+ *(RN moved to react-native-gradle-plugin)*      |
 
-*NOTE: `react-native-code-push` versions lower than **[v5.7.0](https://github.com/microsoft/react-native-code-push/releases/tag/v5.7.0)** will stop working in the near future. You can find more information in our [documentation](https://github.com/microsoft/code-push/blob/master/migration-notice.md).*
+*NOTE: `@d11/dota` versions lower than **[v5.7.0](https://github.com/microsoft/react-native-code-push/releases/tag/v5.7.0)** will stop working in the near future. You can find more information in our [documentation](https://github.com/microsoft/code-push/blob/master/migration-notice.md).*
 
 We work hard to respond to new RN releases, but they do occasionally break us. We will update this chart with each RN release, so that users can check to see what our "official" support is.
 
@@ -115,7 +115,7 @@ As new core components are released, which support referencing assets, we'll upd
 Once you've followed the general-purpose ["getting started"](https://docs.microsoft.com/en-us/appcenter/distribution/codepush/index) instructions for setting up your CodePush account, you can start CodePush-ifying your React Native app by running the following command from within your app's root directory:
 
 ```shell
-npm install --save react-native-code-push
+npm install --save @d11/dota
 ```
 
 As with all other React Native plugins, the integration experience is different for iOS and Android, so perform the following setup steps depending on which platform(s) you are targeting. Note, if you are targeting both platforms it is recommended to create separate CodePush applications for each platform.
@@ -145,7 +145,7 @@ The simplest way to do this is to "CodePush-ify" your app's root component. To d
   * For class component
 
     ```javascript
-    import codePush from "react-native-code-push";
+    import codePush from "@d11/dota";
 
     class MyApp extends Component {
     }
@@ -156,7 +156,7 @@ The simplest way to do this is to "CodePush-ify" your app's root component. To d
   * For functional component
 
     ```javascript
-    import codePush from "react-native-code-push";
+    import codePush from "@d11/dota";
 
     let MyApp: () => React$Node = () => {
     }
@@ -171,7 +171,7 @@ The simplest way to do this is to "CodePush-ify" your app's root component. To d
   * For class component
 
     ```javascript
-    import codePush from "react-native-code-push";
+    import codePush from "@d11/dota";
 
     @codePush
     class MyApp extends Component {
@@ -181,7 +181,7 @@ The simplest way to do this is to "CodePush-ify" your app's root component. To d
   * For functional component
 
     ```javascript
-    import codePush from "react-native-code-push";
+    import codePush from "@d11/dota";
 
     const MyApp: () => React$Node = () => {
     }
@@ -436,7 +436,7 @@ Additionally, if you'd like more details of what a complete mobile CI/CD workflo
 
 ### TypeScript Consumption
 
-This module ships its `*.d.ts` file as part of its NPM package, which allows you to simply `import` it, and receive intellisense in supporting editors (like Visual Studio Code), as well as compile-time type checking if you're using TypeScript. For the most part, this behavior should just work out of the box, however, if you've specified `es6` as the value for either the `target` or `module` [compiler option](http://www.typescriptlang.org/docs/handbook/compiler-options.html) in your [`tsconfig.json`](http://www.typescriptlang.org/docs/handbook/tsconfig-json.html) file, then just make sure that you also set the `moduleResolution` option to `node`. This ensures that the TypeScript compiler will look within the `node_modules` for the type definitions of imported modules. Otherwise, you'll get an error like the following when trying to import the `react-native-code-push` module: `error TS2307: Cannot find module 'react-native-code-push'`.
+This module ships its `*.d.ts` file as part of its NPM package, which allows you to simply `import` it, and receive intellisense in supporting editors (like Visual Studio Code), as well as compile-time type checking if you're using TypeScript. For the most part, this behavior should just work out of the box, however, if you've specified `es6` as the value for either the `target` or `module` [compiler option](http://www.typescriptlang.org/docs/handbook/compiler-options.html) in your [`tsconfig.json`](http://www.typescriptlang.org/docs/handbook/tsconfig-json.html) file, then just make sure that you also set the `moduleResolution` option to `node`. This ensures that the TypeScript compiler will look within the `node_modules` for the type definitions of imported modules. Otherwise, you'll get an error like the following when trying to import the `@d11/dota` module: `error TS2307: Cannot find module '@d11/dota'`.
 
 ---
 

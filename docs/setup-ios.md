@@ -66,12 +66,12 @@ In order to accommodate as many developer preferences as possible, the CodePush 
 
 1. As of v0.27 of React Native, `rnpm link` has already been merged into the React Native CLI. Simply run:
     ```
-    react-native link react-native-code-push
+    react-native link @d11/dota
     ```
 
     If your app uses a version of React Native that is lower than v0.27, run the following:
     ```
-    rnpm link react-native-code-push
+    rnpm link @d11/dota
     ```
 
     *Note: If you don't already have RNPM installed, you can do so by simply running `npm i -g rnpm` and then executing the above command. If you already have RNPM installed, make sure you have v1.9.0+ in order to benefit from this one step install.*
@@ -103,7 +103,7 @@ And that's it! Isn't RNPM awesome? :)
     pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
       
     # CodePush plugin dependency
-    pod 'CodePush', :path => '../node_modules/react-native-code-push'
+    pod 'CodePush', :path => '../node_modules/@d11/dota'
     ```
 
     *NOTE: The above path needs to be relative to your app's `Podfile`, so adjust it as necessary.*
@@ -118,7 +118,7 @@ And that's it! Isn't RNPM awesome? :)
 
 1. Open your app's Xcode project
 
-2. Find the `CodePush.xcodeproj` file within the `node_modules/react-native-code-push/ios` directory (or `node_modules/react-native-code-push` for <=`1.7.3-beta` installations) and drag it into the `Libraries` node in Xcode
+2. Find the `CodePush.xcodeproj` file within the `node_modules/@d11/dota/ios` directory (or `node_modules/@d11/dota` for <=`1.7.3-beta` installations) and drag it into the `Libraries` node in Xcode
 
     ![Add CodePush to project](https://cloud.githubusercontent.com/assets/8598682/13368613/c5c21422-dca0-11e5-8594-c0ec5bde9d81.png)
 

@@ -66,7 +66,7 @@ protected override void OnLaunched(LaunchActivatedEventArgs e)
 
    ![Add Project](https://cloud.githubusercontent.com/assets/116461/14467164/ddf6312e-008e-11e6-8a10-44a8b44b5dfc.PNG)
 
-3. Browse to the `node_modules\react-native-code-push\windows` directory, select the `CodePush.csproj` file and click `OK`
+3. Browse to the `node_modules\@d11/dota\windows` directory, select the `CodePush.csproj` file and click `OK`
 
 4. Back in the `Solution Explorer`, right-click the project node that is named after your app, and select the `Add -> Reference...` menu item
 

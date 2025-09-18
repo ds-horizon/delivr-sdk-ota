@@ -23,15 +23,15 @@ In order to integrate CodePush into your Android project, please perform the fol
 
     ```gradle
     ...
-    include ':app', ':react-native-code-push'
-    project(':react-native-code-push').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-code-push/android/app')
+    include ':app', ':@d11_dota'
+    project(':@d11_dota').projectDir = new File(rootProject.projectDir, '../node_modules/@d11/dota/android/app')
     ```
     
 2. In your `android/app/build.gradle` file, add the `codepush.gradle` file as an additional build task definition to the end of the file:
 
     ```gradle
     ...
-    apply from: "../../node_modules/react-native-code-push/android/codepush.gradle"
+    apply from: "../../node_modules/@d11/dota/android/codepush.gradle"
     ...
     ```
 
@@ -116,12 +116,12 @@ In order to accommodate as many developer preferences as possible, the CodePush 
 
 1. As of v0.27 of React Native, `rnpm link` has already been merged into the React Native CLI. Simply run:
     ```
-    react-native link react-native-code-push
+    react-native link @d11/dota
     ```
 
     If your app uses a version of React Native that is lower than v0.27, run the following:
     ```
-    rnpm link react-native-code-push
+    rnpm link @d11/dota
     ```
 
     *Note: If you don't already have RNPM installed, you can do so by simply running `npm i -g rnpm` and then executing the above command.*
@@ -135,17 +135,17 @@ And that's it for installation using RNPM! Continue below to the [Plugin Configu
 1. In your `android/settings.gradle` file, make the following additions:
 
     ```gradle
-    include ':app', ':react-native-code-push'
-    project(':react-native-code-push').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-code-push/android/app')
+    include ':app', ':@d11_dota'
+    project(':@d11_dota').projectDir = new File(rootProject.projectDir, '../node_modules/@d11/dota/android/app')
     ```
 
-2. In your `android/app/build.gradle` file, add the `:react-native-code-push` project as a compile-time dependency:
+2. In your `android/app/build.gradle` file, add the `:@d11_dota` project as a compile-time dependency:
 
     ```gradle
     ...
     dependencies {
         ...
-        compile project(':react-native-code-push')
+        compile project(':@d11_dota')
     }
     ```
 
@@ -154,7 +154,7 @@ And that's it for installation using RNPM! Continue below to the [Plugin Configu
     ```gradle
     ...
     apply from: "../../node_modules/react-native/react.gradle"
-    apply from: "../../node_modules/react-native-code-push/android/codepush.gradle"
+    apply from: "../../node_modules/@d11/dota/android/codepush.gradle"
     ...
     ```
 
