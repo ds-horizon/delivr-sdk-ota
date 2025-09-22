@@ -82,6 +82,21 @@ Then continue with installing the native module
   * [iOS Setup](docs/setup-ios.md)
   * [Android Setup](docs/setup-android.md)
 
+### Android manual linking (disable autolinking)
+
+If you are following manual linking for Android as described in the setup docs, disable autolinking for `@d11/dota` by adding a `react-native.config.js` at your app root:
+
+```javascript
+module.exports = {
+  dependencies: {
+    '@d11/dota': {
+      platforms: {
+        android: null,
+      },
+    },
+  },
+};
+```
 
 ## Plugin Usage
 
