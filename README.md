@@ -1,8 +1,9 @@
 # React Native Module for CodePush
 <!-- React Native Catalog -->
 
+> ⚠️ This SDK currently supports only the React Native Old Architecture. The New Architecture (Fabric/TurboModules) is not supported yet.
+
 * [How does it work?](#how-does-it-work)
-* [Supported React Native Platforms](#supported-react-native-platforms)
 * [Supported Components](#supported-components)
 * [Getting Started](#getting-started)
     * [iOS Setup](docs/setup-ios.md)
@@ -34,13 +35,8 @@ In order to ensure that your end users always have a functioning version of your
 
 *Note: Any product changes which touch native code (e.g. modifying your `AppDelegate.m`/`MainActivity.java` file, adding a new plugin) cannot be distributed via CodePush, and therefore, must be updated via the appropriate store(s).*
 
-## Supported React Native platforms
 
-- iOS (7+)
-- Android (4.1+) on TLS 1.2 compatible devices
-
-
-### Supported Components
+## Supported Components
 
 When using the React Native assets system (i.e. using the `require("./foo.png")` syntax), the following list represents the set of core components (and props) that support having their referenced images and videos updated via CodePush:
 
@@ -76,27 +72,11 @@ You can start CodePush-ifying your React Native app by running the following com
 npm install --save @d11/dota
 ```
 
-As with all other React Native plugins, the integration experience is different for iOS and Android, so perform the following setup steps depending on which platform(s) you are targeting. Note, if you are targeting both platforms it is recommended to create separate CodePush applications for each platform.
+As with all other React Native plugins, the integration experience is different for iOS and Android, so perform the following setup steps depending on which platform(s) you are targeting. Note, if you are targeting both platforms it is recommended to create separate CodePush applications for each platform through DOTA dashboard.
 
 Then continue with installing the native module
   * [iOS Setup](docs/setup-ios.md)
   * [Android Setup](docs/setup-android.md)
-
-### Android manual linking (disable autolinking)
-
-If you are following manual linking for Android as described in the setup docs, disable autolinking for `@d11/dota` by adding a `react-native.config.js` at your app root:
-
-```javascript
-module.exports = {
-  dependencies: {
-    '@d11/dota': {
-      platforms: {
-        android: null,
-      },
-    },
-  },
-};
-```
 
 ## Plugin Usage
 
