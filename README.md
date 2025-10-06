@@ -9,7 +9,7 @@
 * [Getting Started](#getting-started)
     * [iOS Setup](docs/setup-ios.md)
     * [Android Setup](docs/setup-android.md)
-* [Plugin Usage](#plugin-usage)
+* [Usage](#usage)
 * [Creating the JavaScript bundle](#creating-the-javascript-bundle-hermes)
 * [Releasing Updates](#releasing-updates)
 * [Store Guideline Compliance](#store-guideline-compliance)
@@ -70,7 +70,7 @@ In order to ensure that your end users always have a functioning version of your
 You can start CodePush-ifying your React Native app by running the following command from within your app's root directory:
 
 ```shell
-npm install --save @d11/dota
+yarn add @d11/dota
 ```
 
 As with all other React Native plugins, the integration experience is different for iOS and Android, so perform the following setup steps depending on which platform(s) you are targeting. Note, if you are targeting both platforms it is recommended to create separate CodePush applications for each platform through DOTA dashboard.
@@ -79,116 +79,65 @@ Then continue with installing the native module
   * [iOS Setup](docs/setup-ios.md)
   * [Android Setup](docs/setup-android.md)
 
-## Plugin Usage
+## Usage
 
-With the CodePush plugin downloaded and linked, and your app asking CodePush where to get the right JS bundle from, the only thing left is to add the necessary code to your app to control the following policies:
+The only thing left is to add the necessary code to your app to control the following policies:
 
 1. When (and how often) to check for an update? (for example app start, in response to clicking a button in a settings page, periodically at some fixed interval)
 
 2. When an update is available, how to present it to the end user?
 
-The simplest way to do this is to "CodePush-ify" your app's root component. To do so, you can choose one of the following two options:
+The simplest way to do this is to "CodePush-ify" your app's root component.
 
-* **Option 1: Wrap your root component with the `codePush` higher-order component:**
+* Wrap your root component with the `codePush`:**
 
-  * For class component
+  ```javascript
+  import codePush from "@d11/dota";
 
-    ```javascript
-    import codePush from "@d11/dota";
+  function MyApp () {
+    ...
+  }
 
-    class MyApp extends Component {
-    }
-
-    MyApp = codePush(MyApp);
-    ```
-
-  * For functional component
-
-    ```javascript
-    import codePush from "@d11/dota";
-
-    let MyApp: () => React$Node = () => {
-    }
-
-    MyApp = codePush(MyApp);
-    ```
-
-* **Option 2: Use the [ES7 decorator](https://github.com/wycats/javascript-decorators) syntax:**
-
-    *NOTE: Decorators are not yet supported in Babel 6.x pending proposal update.* You may need to enable it by installing and using [babel-preset-react-native-stage-0](https://github.com/skevy/babel-preset-react-native-stage-0#babel-preset-react-native-stage-0).
-
-  * For class component
-
-    ```javascript
-    import codePush from "@d11/dota";
-
-    @codePush
-    class MyApp extends Component {
-    }
-    ```
-
-  * For functional component
-
-    ```javascript
-    import codePush from "@d11/dota";
-
-    const MyApp: () => React$Node = () => {
-    }
-
-    export default codePush(MyApp);
-    ```
+  export default codePush(MyApp);
+  ```
 
 By default, CodePush will check for updates on every app start. If an update is available, it will be silently downloaded, and installed the next time the app is restarted (either explicitly by the end user or by the OS), which ensures the least invasive experience for your end users. If an available update is mandatory, then it will be installed immediately, ensuring that the end user gets it as soon as possible.
 
 If you would like your app to discover updates more quickly, you can also choose to sync up with the CodePush server every time the app resumes from the background.
 
-* For class component
 
-    ```javascript
-    let codePushOptions = { checkFrequency: codePush.CheckFrequency.ON_APP_RESUME };
+  ```javascript
+  let codePushOptions = { checkFrequency: codePush.CheckFrequency.ON_APP_RESUME };
 
-    class MyApp extends Component {
-    }
+  function MyApp {
+  }
 
-    MyApp = codePush(codePushOptions)(MyApp);
-    ```
-
-* For functional component
-
-    ```javascript
-    let codePushOptions = { checkFrequency: codePush.CheckFrequency.ON_APP_RESUME };
-
-    let MyApp: () => React$Node = () => {
-    }
-
-    MyApp = codePush(codePushOptions)(MyApp);
-    ```
+  export default codePush(codePushOptions)(MyApp);
+  ```
 
 Alternatively, if you want fine-grained control over when the check happens (like a button press or timer interval), you can call [`CodePush.sync()`](docs/api-js.md#codepushsync) at any time with your desired `SyncOptions`, and optionally turn off CodePush's automatic checking by specifying a manual `checkFrequency`:
 
 ```javascript
 let codePushOptions = { checkFrequency: codePush.CheckFrequency.MANUAL };
 
-class MyApp extends Component {
-    onButtonPress() {
-        codePush.sync({
-            updateDialog: true,
-            installMode: codePush.InstallMode.IMMEDIATE
-        });
-    }
+function MyApp {
+  const onButtonPress = () => {
+    codePush.sync({
+      updateDialog: true,
+      installMode: codePush.InstallMode.IMMEDIATE,
+    });
+  };
 
-    render() {
-        return (
-            <View>
-                <TouchableOpacity onPress={this.onButtonPress}>
-                    <Text>Check for updates</Text>
-                </TouchableOpacity>
-            </View>
-        )
-    }
-}
+  return (
+    <View>
+      <TouchableOpacity onPress={onButtonPress}>
+        <Text>Check for updates</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
-MyApp = codePush(codePushOptions)(MyApp);
+export default codePush(codePushOptions)(MyApp);
 ```
 
 If you would like to display an update confirmation dialog (an "active install"), configure when an available update is installed (like force an immediate restart) or customize the update experience in any other way, refer to the [`codePush()`](docs/api-js.md#codepush) API reference for information on how to tweak this default behavior.
