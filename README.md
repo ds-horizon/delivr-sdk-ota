@@ -3,8 +3,9 @@
 
 > ⚠️ This SDK currently supports only the React Native Old Architecture. We are working on providing support for New Architecture (Fabric/TurboModules).
 
+* [Problem Statement](#problem-statement)
+* [What is Dota?](#what-is-dota)
 * [How does it work?](#how-does-it-work)
-* [Supported Components](#supported-components)
 * [Getting Started](#getting-started)
     * [iOS Setup](docs/setup-ios.md)
     * [Android Setup](docs/setup-android.md)
@@ -12,6 +13,7 @@
 * [Creating the JavaScript bundle](#creating-the-javascript-bundle-hermes)
 * [Releasing Updates](#releasing-updates)
 * [Store Guideline Compliance](#store-guideline-compliance)
+* [Supported Components](#supported-components)
 * [Multi-Deployment Testing](#multi-deployment-testing)
     * [Android](docs/multi-deployment-testing-android.md)
     * [iOS](docs/multi-deployment-testing-ios.md)
@@ -26,6 +28,33 @@
 
 <!-- React Native Catalog -->
 
+## Problem Statement
+
+Releasing updates for mobile apps is slow and cumbersome. Even small fixes or UI tweaks require pushing a new binary to the App Store or Play Store, followed by lengthy review cycles and user updates.
+
+* 7-day review cycles on app stores slows your release velocity
+
+* Manual release overhead makes hotfixes painful
+
+* Bug-induced releases damages user experience and retention
+
+* Lost developer velocity due to repeated native builds
+
+## What is DOTA?
+
+DOTA is Dream11’s Over-The-Air (OTA) solution for React Native apps, built on top of CodePush.
+It allows you to deliver JavaScript and asset updates instantly — without re-submitting to app stores.
+
+DOTA brings:
+
+* Instant updates: Push JS changes in minutes
+
+* Automatic rollbacks: Stay safe from bad releases
+
+* Staged rollouts: Gradual and controlled deployment
+
+* Enterprise scale: Battle-tested at Dream11
+
 ## How does it work?
 
 A React Native app is composed of JavaScript files and any accompanying [images](https://reactnative.dev/docs/image), which are bundled together by the [metro bundler](https://github.com/facebook/metro) and distributed as part of a platform-specific binary (i.e. an `.ipa` or `.apk` file). Once the app is released, updating either the JavaScript code (e.g. making bug fixes, adding new features) or image assets, requires you to recompile and redistribute the entire binary, which of course, includes any review time associated with the store(s) you are publishing to.
@@ -35,35 +64,6 @@ The CodePush helps get product improvements in front of your end users instantly
 In order to ensure that your end users always have a functioning version of your app, the CodePush plugin maintains a copy of the previous update, so that in the event that you accidentally push an update which includes a crash, it can automatically roll back. This way, you can rest assured that your newfound release agility won't result in users becoming blocked before you have a chance to roll back on the server. It's a win-win-win!
 
 *Note: Any product changes which touch native code (e.g. modifying your `AppDelegate.m`/`MainActivity.java` file, adding a new plugin) cannot be distributed via CodePush, and therefore, must be updated via the appropriate store(s).*
-
-
-## Supported Components
-
-When using the React Native assets system (i.e. using the `require("./foo.png")` syntax), the following list represents the set of core components (and props) that support having their referenced images and videos updated via CodePush:
-
-| Component                                       | Prop(s)                                  |
-|-------------------------------------------------|------------------------------------------|
-| `Image`                                         | `source`                                 |
-| `MapView.Marker` <br />*(Requires [react-native-maps](https://github.com/lelandrichardson/react-native-maps) `>=O.3.2`)* | `image`                             |
-| `ProgressViewIOS`                               | `progressImage`, `trackImage`            |
-| `TabBarIOS.Item`                                | `icon`, `selectedIcon`                   |
-| `ToolbarAndroid` <br />*(React Native 0.21.0+)* | `actions[].icon`, `logo`, `overflowIcon` |
-| `Video`                                         | `source`                                 |
-
-The following list represents the set of components (and props) that don't currently support their assets being updated via CodePush, due to their dependency on static images and videos (i.e. using the `{ uri: "foo" }` syntax):
-
-| Component   | Prop(s)                                                              |
-|-------------|----------------------------------------------------------------------|
-| `SliderIOS` | `maximumTrackImage`, `minimumTrackImage`, `thumbImage`, `trackImage` |
-| `Video`     | `source`                                                             |
-
-As new core components are released, which support referencing assets, we'll update this list to ensure users know what exactly they can expect to update using CodePush.
-
-*Note: CodePush only works with Video components when using `require` in the source prop. For example:*
-
-```javascript
-<Video source={require("./foo.mp4")} />
-```
 
 ## Getting Started
 
@@ -291,6 +291,34 @@ To further remain in compliance with Apple's guidelines we suggest that App Stor
 > Apps must not force users to rate the app, review the app, download other apps, or other similar actions in order to access functionality, content, or use of the app.
 
 This is not necessarily the case for `updateDialog`, since it won't force the user to download the new version, but at least you should be aware of that ruling if you decide to show it.
+
+## Supported Components
+
+When using the React Native assets system (i.e. using the `require("./foo.png")` syntax), the following list represents the set of core components (and props) that support having their referenced images and videos updated via CodePush:
+
+| Component                                       | Prop(s)                                  |
+|-------------------------------------------------|------------------------------------------|
+| `Image`                                         | `source`                                 |
+| `MapView.Marker` <br />*(Requires [react-native-maps](https://github.com/lelandrichardson/react-native-maps) `>=O.3.2`)* | `image`                             |
+| `ProgressViewIOS`                               | `progressImage`, `trackImage`            |
+| `TabBarIOS.Item`                                | `icon`, `selectedIcon`                   |
+| `ToolbarAndroid` <br />*(React Native 0.21.0+)* | `actions[].icon`, `logo`, `overflowIcon` |
+| `Video`                                         | `source`                                 |
+
+The following list represents the set of components (and props) that don't currently support their assets being updated via CodePush, due to their dependency on static images and videos (i.e. using the `{ uri: "foo" }` syntax):
+
+| Component   | Prop(s)                                                              |
+|-------------|----------------------------------------------------------------------|
+| `SliderIOS` | `maximumTrackImage`, `minimumTrackImage`, `thumbImage`, `trackImage` |
+| `Video`     | `source`                                                             |
+
+As new core components are released, which support referencing assets, we'll update this list to ensure users know what exactly they can expect to update using CodePush.
+
+*Note: CodePush only works with Video components when using `require` in the source prop. For example:*
+
+```javascript
+<Video source={require("./foo.mp4")} />
+```
 
 ### Multi-Deployment Testing
 
