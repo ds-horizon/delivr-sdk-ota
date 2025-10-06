@@ -89,7 +89,7 @@ The only thing left is to add the necessary code to your app to control the foll
 
 The simplest way to do this is to "CodePush-ify" your app's root component.
 
-* Wrap your root component with the `codePush`:**
+* Wrap your root component with the `codePush`:
 
   ```javascript
   import codePush from "@d11/dota";
@@ -107,9 +107,12 @@ If you would like your app to discover updates more quickly, you can also choose
 
 
   ```javascript
-  let codePushOptions = { checkFrequency: codePush.CheckFrequency.ON_APP_RESUME };
+  import codePush, { CodePushOptions } from '@d11/dota';
+
+  let codePushOptions: CodePushOptions = { checkFrequency: codePush.CheckFrequency.ON_APP_RESUME };
 
   function MyApp {
+    ...
   }
 
   export default codePush(codePushOptions)(MyApp);
@@ -118,7 +121,9 @@ If you would like your app to discover updates more quickly, you can also choose
 Alternatively, if you want fine-grained control over when the check happens (like a button press or timer interval), you can call [`CodePush.sync()`](docs/api-js.md#codepushsync) at any time with your desired `SyncOptions`, and optionally turn off CodePush's automatic checking by specifying a manual `checkFrequency`:
 
 ```javascript
-let codePushOptions = { checkFrequency: codePush.CheckFrequency.MANUAL };
+import codePush, { CodePushOptions } from '@d11/dota';
+
+let codePushOptions: CodePushOptions = { checkFrequency: codePush.CheckFrequency.MANUAL };
 
 function MyApp {
   const onButtonPress = () => {
@@ -174,12 +179,6 @@ Options:
 # Example with options
 yarn dota bundle --platform android --bundle-path ./custom-path --make-sourcemap
 ```
-
-Important:
-- Each run starts by cleaning the `.codepush/` directory. If you run Android and then iOS consecutively, the second run will remove the first run’s outputs.
-- If you need both Android and iOS bundles at the same time, either:
-  - Rename or move the `.codepush/` folder after the first run (e.g., to `.codepush-android`) before running the second command, or
-  - Customize the scripts to use platform-specific output paths (e.g., `.codepush/android` and `.codepush/ios`).
 
 #### Output Files
 
@@ -336,7 +335,7 @@ The `sync` method includes a lot of diagnostic logging out-of-the-box, so if you
 
 The simplest way to view these logs is to add the flag `--debug` for each command. This will output a log stream that is filtered to just CodePush messages. This makes it easy to identify issues, without needing to use a platform-specific tool, or wade through a potentially high volume of logs.
 
-<img width="540" alt="screen shot 2016-06-21 at 10 15 42 am" src="https://cloud.githubusercontent.com/assets/116461/16246973/838e2e98-37bc-11e6-9649-685f39e325a0.png">
+<img width="540" alt="screen shot 2016-06-21 at 10 15 42 am" src="https://cloud.githubusercontent.com/assets/116461/16246973/838e2e98-37bc-11e6-9649-685f39e325a0.png" />
 
 Additionally, you can also use any of the platform-specific tools to view the CodePush logs, if you are more comfortable with them. Simple start up the Chrome DevTools Console, the Xcode Console (iOS), the [OS X Console](https://en.wikipedia.org/wiki/Console_%28OS_X%29#.7E.2FLibrary.2FLogs) (iOS) and/or ADB logcat (Android), and look for messages which are prefixed with `[CodePush]`.
 
