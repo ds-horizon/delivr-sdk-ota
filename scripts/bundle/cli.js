@@ -36,6 +36,7 @@ program
           fs.mkdirSync(dir, { recursive: true });
         } else {
           fs.rmSync(dir, { recursive: true });
+          fs.mkdirSync(dir, { recursive: true });
         }
       });
 
