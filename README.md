@@ -1,4 +1,4 @@
-# React Native Module for CodePush
+# React Native Module for OTA Updates
 <!-- React Native Catalog -->
 
 > ⚠️ This SDK currently supports only the React Native Old Architecture. We are working on providing support for New Architecture (Fabric/TurboModules).
@@ -32,7 +32,7 @@
 
 Releasing updates for mobile apps is slow and cumbersome. Even small fixes or UI tweaks require pushing a new binary to the App Store or Play Store, followed by lengthy review cycles and user updates.
 
-* 7-day review cycles on app stores slows your release velocity
+* Multiple days review cycles on app stores slows your release velocity
 
 * Manual release overhead makes hotfixes painful
 
@@ -42,7 +42,7 @@ Releasing updates for mobile apps is slow and cumbersome. Even small fixes or UI
 
 ## What is DOTA?
 
-DOTA is Dream11’s Over-The-Air (OTA) solution for React Native apps, built on top of CodePush.
+DOTA is Dream11’s Over-The-Air (OTA) solution for React Native apps.
 It allows you to deliver JavaScript and asset updates instantly — without re-submitting to app stores.
 
 DOTA brings:
@@ -59,21 +59,26 @@ DOTA brings:
 
 A React Native app is composed of JavaScript files and any accompanying [images](https://reactnative.dev/docs/image), which are bundled together by the [metro bundler](https://github.com/facebook/metro) and distributed as part of a platform-specific binary (i.e. an `.ipa` or `.apk` file). Once the app is released, updating either the JavaScript code (e.g. making bug fixes, adding new features) or image assets, requires you to recompile and redistribute the entire binary, which of course, includes any review time associated with the store(s) you are publishing to.
 
-The CodePush helps get product improvements in front of your end users instantly, by keeping your JavaScript and images synchronized with updates you release to the CodePush server. This way, your app gets the benefits of an offline mobile experience, as well as the "web-like" agility of side-loading updates as soon as they are available. It's a win-win!
+DOTA helps get product improvements in front of your end users instantly, by keeping your JavaScript and images synchronized with updates you release to the DOTA server. This way, your app gets the benefits of an offline mobile experience, as well as the "web-like" agility of side-loading updates as soon as they are available. It's a win-win!
 
-In order to ensure that your end users always have a functioning version of your app, the CodePush plugin maintains a copy of the previous update, so that in the event that you accidentally push an update which includes a crash, it can automatically roll back. This way, you can rest assured that your newfound release agility won't result in users becoming blocked before you have a chance to roll back on the server. It's a win-win-win!
+In order to ensure that your end users always have a functioning version of your app, the DOTA plugin maintains a copy of the previous update, so that in the event that you accidentally push an update which includes a crash, it can automatically roll back. This way, you can rest assured that your newfound release agility won't result in users becoming blocked before you have a chance to roll back on the server. It's a win-win-win!
 
-*Note: Any product changes which touch native code (e.g. modifying your `AppDelegate.m`/`MainActivity.java` file, adding a new plugin) cannot be distributed via CodePush, and therefore, must be updated via the appropriate store(s).*
+*Note: Any product changes which touch native code (e.g. modifying your `AppDelegate.m`/`MainActivity.java` file, adding a new plugin) cannot be distributed via DOTA, and therefore, must be updated via the appropriate store(s).*
 
 ## Getting Started
 
-You can start CodePush-ifying your React Native app by running the following command from within your app's root directory:
+You can add DOTA to your React Native app by running the following command from within your app's root directory:
 
+* Yarn
 ```shell
 yarn add @d11/dota
 ```
+* NPM
+```shell
+npm install @d11/dota
+```
 
-As with all other React Native plugins, the integration experience is different for iOS and Android, so perform the following setup steps depending on which platform(s) you are targeting. Note, if you are targeting both platforms it is recommended to create separate CodePush applications for each platform through DOTA dashboard.
+As with all other React Native plugins, the integration experience is different for iOS and Android, so perform the following setup steps depending on which platform(s) you are targeting. Note, if you are targeting both platforms it is recommended to create separate DOTA applications for each platform through DOTA dashboard.
 
 Then continue with installing the native module
   * [iOS Setup](docs/setup-ios.md)
@@ -101,9 +106,9 @@ The simplest way to do this is to "CodePush-ify" your app's root component.
   export default codePush(MyApp);
   ```
 
-By default, CodePush will check for updates on every app start. If an update is available, it will be silently downloaded, and installed the next time the app is restarted (either explicitly by the end user or by the OS), which ensures the least invasive experience for your end users. If an available update is mandatory, then it will be installed immediately, ensuring that the end user gets it as soon as possible.
+By default, DOTA will check for updates on every app start. If an update is available, it will be silently downloaded, and installed the next time the app is restarted (either explicitly by the end user or by the OS), which ensures the least invasive experience for your end users. If an available update is mandatory, then it will be installed immediately, ensuring that the end user gets it as soon as possible.
 
-If you would like your app to discover updates more quickly, you can also choose to sync up with the CodePush server every time the app resumes from the background.
+If you would like your app to discover updates more quickly, you can also choose to sync up with the DOTA server every time the app resumes from the background.
 
 
   ```javascript
@@ -149,7 +154,7 @@ If you would like to display an update confirmation dialog (an "active install")
 
 ## Creating the JavaScript bundle (Hermes)
 
-There are two ways to generate the JavaScript bundle for CodePush:
+There are two ways to generate the JavaScript bundle for DOTA:
 
 ### 1. Automated Bundle Generation (Recommended)
 
@@ -186,7 +191,7 @@ end
 cd ios && pod install
 ```
 
-This will add a new build phase named "[Dota] Copy CodePush Bundle" that automatically handles bundle generation and copying. The bundles and assets will be generated in `.dota/<platform>` directory at your project root.
+This will add a new build phase named "[Dota] Copy DOTA Bundle" that automatically handles bundle generation and copying. The bundles and assets will be generated in `.dota/<platform>` directory at your project root.
 
 ### 2. Manual Bundle Generation (Using CLI Tool)
 
@@ -246,7 +251,7 @@ Release via the DOTA dashboard:
 4. Upload your JS bundle (see [Creating the JavaScript bundle](#creating-the-javascript-bundle-hermes)).
 5. Set the target app version for this release.
 6. Choose a rollout percentage.
-7. Click Launch Release to publish the CodePush update.
+7. Click Launch Release to publish the DOTA update.
 
 Manage releases:
 - To increase/decrease rollout or halt a release, go to the Deployments tab and select the deployment you want to manage.
@@ -254,18 +259,18 @@ Manage releases:
 ![Manage Release](assets/manage-release-2.png)
 If you run into any issues, check out the [troubleshooting](#debugging--troubleshooting) details below.
 
-*NOTE: CodePush updates should be tested in modes other than Debug mode. In Debug mode, React Native app always downloads JS bundle generated by packager, so JS bundle downloaded by CodePush does not apply.*
+*NOTE: DOTA updates should be tested in modes other than Debug mode. In Debug mode, React Native app always downloads JS bundle generated by packager, so JS bundle downloaded by DOTA does not apply.*
 
 ### Store Guideline Compliance
 
-Android Google Play and iOS App Store have corresponding guidelines that have rules you should be aware of before integrating the CodePush solution within your application.
+Android Google Play and iOS App Store have corresponding guidelines that have rules you should be aware of before integrating the DOTA solution within your application.
 
 #### Google play
 
 Third paragraph of [Device and Network Abuse](https://support.google.com/googleplay/android-developer/answer/9888379?hl=en) topic describe that updating source code by any method other than Google Play's update mechanism is restricted. But this restriction does not apply to updating javascript bundles.
 > This restriction does not apply to code that runs in a virtual machine and has limited access to Android APIs (such as JavaScript in a webview or browser).
 
-That fully allow CodePush as it updates just JS bundles and can't update native code part.
+That fully allow DOTA as it updates just JS bundles and can't update native code part.
 
 #### App Store
 
@@ -273,7 +278,7 @@ Paragraph **3.3.2**, since back in 2015's [Apple Developer Program License Agree
 
 > Interpreted code may be downloaded to an Application but only so long as such code: (a) does not change the primary purpose of the Application by providing features or functionality that are inconsistent with the intended and advertised purpose of the Application as submitted to the App Store, (b) does not create a store or storefront for other code or applications, and (c) does not bypass signing, sandbox, or other security features of the OS.
 
-CodePush allows you to follow these rules in full compliance so long as the update you push does not significantly deviate your product from its original App Store approved intent.
+DOTA allows you to follow these rules in full compliance so long as the update you push does not significantly deviate your product from its original App Store approved intent.
 
 To further remain in compliance with Apple's guidelines we suggest that App Store-distributed apps don't enable the `updateDialog` option when calling `sync`, since in the [App Store Review Guidelines](https://developer.apple.com/app-store/review/guidelines/) it is written that:
 
@@ -283,7 +288,7 @@ This is not necessarily the case for `updateDialog`, since it won't force the us
 
 ## Supported Components
 
-When using the React Native assets system (i.e. using the `require("./foo.png")` syntax), the following list represents the set of core components (and props) that support having their referenced images and videos updated via CodePush:
+When using the React Native assets system (i.e. using the `require("./foo.png")` syntax), the following list represents the set of core components (and props) that support having their referenced images and videos updated via DOTA:
 
 | Component                                       | Prop(s)                                  |
 |-------------------------------------------------|------------------------------------------|
@@ -294,16 +299,16 @@ When using the React Native assets system (i.e. using the `require("./foo.png")`
 | `ToolbarAndroid` <br />*(React Native 0.21.0+)* | `actions[].icon`, `logo`, `overflowIcon` |
 | `Video`                                         | `source`                                 |
 
-The following list represents the set of components (and props) that don't currently support their assets being updated via CodePush, due to their dependency on static images and videos (i.e. using the `{ uri: "foo" }` syntax):
+The following list represents the set of components (and props) that don't currently support their assets being updated via DOTA, due to their dependency on static images and videos (i.e. using the `{ uri: "foo" }` syntax):
 
 | Component   | Prop(s)                                                              |
 |-------------|----------------------------------------------------------------------|
 | `SliderIOS` | `maximumTrackImage`, `minimumTrackImage`, `thumbImage`, `trackImage` |
 | `Video`     | `source`                                                             |
 
-As new core components are released, which support referencing assets, we'll update this list to ensure users know what exactly they can expect to update using CodePush.
+As new core components are released, which support referencing assets, we'll update this list to ensure users know what exactly they can expect to update using DOTA.
 
-*Note: CodePush only works with Video components when using `require` in the source prop. For example:*
+*Note: DOTA only works with Video components when using `require` in the source prop. For example:*
 
 ```javascript
 <Video source={require("./foo.mp4")} />
@@ -311,13 +316,13 @@ As new core components are released, which support referencing assets, we'll upd
 
 ### Multi-Deployment Testing
 
-In our [getting started](#getting-started) docs, we illustrated how to configure the CodePush plugin using a specific deployment key. However, in order to effectively test your releases, it is critical that you leverage the `Staging` and `Production` deployments that are auto-generated when you first created your CodePush app (or any custom deployments you may have created). This way, you never release an update to your end users that you haven't been able to validate yourself.
+In our [getting started](#getting-started) docs, we illustrated how to configure the DOTA plugin using a specific deployment key. However, in order to effectively test your releases, it is critical that you leverage the `Staging` and `Production` deployments that are auto-generated when you first created your DOTA app (or any custom deployments you may have created). This way, you never release an update to your end users that you haven't been able to validate yourself.
 
 *NOTE: Our client-side rollback feature can help unblock users after installing a release that resulted in a crash, and server-side rollbacks allow you to prevent additional users from installing a bad release once it's been identified. However, it's obviously better if you can prevent an erroneous update from being broadly released in the first place.*
 
 Taking advantage of the `Staging` and `Production` deployments allows you to achieve a workflow like the following (feel free to customize!):
 
-1. Release a CodePush update to your `Staging` deployment using the DOTA dashboard
+1. Release a DOTA update to your `Staging` deployment using the DOTA dashboard
 
 2. Run your staging/beta build of your app, sync the update from the server, and verify it works as expected
 
@@ -327,7 +332,7 @@ Taking advantage of the `Staging` and `Production` deployments allows you to ach
 
 *NOTE: If you want to take a more cautious approach, you can even choose to perform a "staged rollout" as part of #3, which allows you to mitigate additional potential risk with the update (like did your testing in #2 touch all possible devices/conditions?) by only making the production update available to a percentage of your users. Then, after waiting for a reasonable amount of time to see if any crash reports or customer feedback comes in, you can expand it to your entire audience through DOTA dashboard.*
 
-You'll notice that the above steps refer to a "staging build" and "production build" of your app. If your build process already generates distinct binaries per "environment", then you don't need to read any further, since swapping out CodePush deployment keys is just like handling environment-specific config for any other service your app uses (like Facebook). However, if you're looking for examples (**including demo projects**) on how to setup your build process to accommodate this, then refer to the following sections, depending on the platform(s) your app is targeting:
+You'll notice that the above steps refer to a "staging build" and "production build" of your app. If your build process already generates distinct binaries per "environment", then you don't need to read any further, since swapping out DOTA deployment keys is just like handling environment-specific config for any other service your app uses (like Facebook). However, if you're looking for examples (**including demo projects**) on how to setup your build process to accommodate this, then refer to the following sections, depending on the platform(s) your app is targeting:
 
   * [Android](docs/multi-deployment-testing-android.md)
   * [iOS](docs/multi-deployment-testing-ios.md)
@@ -335,7 +340,7 @@ You'll notice that the above steps refer to a "staging build" and "production bu
 
 ### Dynamic Deployment Assignment
 
-The above section illustrated how you can leverage multiple CodePush deployments in order to effectively test your updates before broadly releasing them to your end users. However, since that workflow statically embeds the deployment assignment into the actual binary, a staging or production build will only ever sync updates from that deployment. In many cases, this is sufficient, since you only want your team, customers, stakeholders, etc. to sync with your pre-production releases, and therefore, only they need a build that knows how to sync with staging. However, if you want to be able to perform A/B tests, or provide early access of your app to certain users, it can prove very useful to be able to dynamically place specific users (or audiences) into specific deployments at runtime.
+The above section illustrated how you can leverage multiple DOTA deployments in order to effectively test your updates before broadly releasing them to your end users. However, since that workflow statically embeds the deployment assignment into the actual binary, a staging or production build will only ever sync updates from that deployment. In many cases, this is sufficient, since you only want your team, customers, stakeholders, etc. to sync with your pre-production releases, and therefore, only they need a build that knows how to sync with staging. However, if you want to be able to perform A/B tests, or provide early access of your app to certain users, it can prove very useful to be able to dynamically place specific users (or audiences) into specific deployments at runtime.
 
 In order to achieve this kind of workflow, all you need to do is specify the deployment key you want the current user to syncronize with when calling the `codePush` method. When specified, this key will override the "default" one that was provided in your app's `Info.plist` (iOS) or `MainActivity.java` (Android) files. This allows you to produce a build for staging or production, that is also capable of being dynamically "redirected" as needed.
 
@@ -370,11 +375,11 @@ Since we recommend using the `Staging` deployment for pre-release testing of you
 
 The `sync` method includes a lot of diagnostic logging out-of-the-box, so if you're encountering an issue when using it, the best thing to try first is examining the output logs of your app. This will tell you whether the app is configured correctly (like can the plugin find your deployment key?), if the app is able to reach the server, if an available update is being discovered, if the update is being successfully downloaded/installed, etc.
 
-The simplest way to view these logs is to add the flag `--debug` for each command. This will output a log stream that is filtered to just CodePush messages. This makes it easy to identify issues, without needing to use a platform-specific tool, or wade through a potentially high volume of logs.
+The simplest way to view these logs is to add the flag `--debug` for each command. This will output a log stream that is filtered to just DOTA messages. This makes it easy to identify issues, without needing to use a platform-specific tool, or wade through a potentially high volume of logs.
 
 <img width="540" alt="screen shot 2016-06-21 at 10 15 42 am" src="https://cloud.githubusercontent.com/assets/116461/16246973/838e2e98-37bc-11e6-9649-685f39e325a0.png" />
 
-Additionally, you can also use any of the platform-specific tools to view the CodePush logs, if you are more comfortable with them. Simple start up the Chrome DevTools Console, the Xcode Console (iOS), the [OS X Console](https://en.wikipedia.org/wiki/Console_%28OS_X%29#.7E.2FLibrary.2FLogs) (iOS) and/or ADB logcat (Android), and look for messages which are prefixed with `[CodePush]`.
+Additionally, you can also use any of the platform-specific tools to view the DOTA logs, if you are more comfortable with them. Simple start up the Chrome DevTools Console, the Xcode Console (iOS), the [OS X Console](https://en.wikipedia.org/wiki/Console_%28OS_X%29#.7E.2FLibrary.2FLogs) (iOS) and/or ADB logcat (Android), and look for messages which are prefixed with `[CodePush]`.
 
 Note that by default, React Native logs are disabled on iOS in release builds, so if you want to view them in a release build, you need to make the following changes to your `AppDelegate.m` file:
 
@@ -386,17 +391,17 @@ Note that by default, React Native logs are disabled on iOS in release builds, s
     RCTSetLogThreshold(RCTLogLevelInfo);
     ```
 
-Now you'll be able to see CodePush logs in either debug or release mode, on both iOS or Android. If examining the logs don't provide an indication of the issue, please refer to the following common issues for additional resolution ideas:
+Now you'll be able to see DOTA logs in either debug or release mode, on both iOS or Android. If examining the logs don't provide an indication of the issue, please refer to the following common issues for additional resolution ideas:
 
 | Issue / Symptom | Possible Solution |
 |-----------------|-------------------|
-| Compilation Error | Double-check that your version of React Native is [compatible](#supported-react-native-platforms) with the CodePush version you are using. |
+| Compilation Error | Double-check that your version of React Native is [compatible](#supported-react-native-platforms) with the DOTA version you are using. |
 | Network timeout / hang when calling `sync` or `checkForUpdate` in the iOS Simulator | Try resetting the simulator by selecting the `Simulator -> Reset Content and Settings..` menu item, and then re-running your app. |
 | Server responds with a `404` when calling `sync` or `checkForUpdate` | Double-check that the deployment key you added to your `Info.plist` (iOS), `build.gradle` (Android) or that you're passing to `sync`/`checkForUpdate`, is in fact correct. You can run `appcenter codepush deployment list <ownerName>/<appName> --displayKeys` to view the correct keys for your app deployments. |
-| Update not being discovered | Double-check that the version of your running app (like `1.0.0`) matches the version you specified when releasing the update to CodePush. Additionally, make sure that you are releasing to the same deployment that your app is configured to sync with. |
+| Update not being discovered | Double-check that the version of your running app (like `1.0.0`) matches the version you specified when releasing the update to DOTA. Additionally, make sure that you are releasing to the same deployment that your app is configured to sync with. |
 | Update not being displayed after restart | If you're not calling `sync` on app start (like within `componentDidMount` of your root component), then you need to explicitly call `notifyApplicationReady` on app start, otherwise, the plugin will think your update failed and roll it back. |
 | I've released an update for iOS but my Android app also shows an update and it breaks it | Be sure you have different deployment keys for each platform in order to receive updates correctly |
-| I've released new update but changes are not reflected | Be sure that you are running app in modes other than Debug. In Debug mode, React Native app always downloads JS bundle generated by packager, so JS bundle downloaded by CodePush does not apply.
+| I've released new update but changes are not reflected | Be sure that you are running app in modes other than Debug. In Debug mode, React Native app always downloads JS bundle generated by packager, so JS bundle downloaded by DOTA does not apply.
 | No JS bundle is being found when running your app against the iOS simulator | By default, React Native doesn't generate your JS bundle when running against the simulator. Therefore, if you're using `[CodePush bundleURL]`, and targetting the iOS simulator, you may be getting a `nil` result. This issue will be fixed in RN 0.22.0, but only for release builds. You can unblock this scenario right now by making [this change](https://github.com/facebook/react-native/commit/9ae3714f4bebdd2bcab4d7fdbf23acebdc5ed2ba) locally.
 
 
