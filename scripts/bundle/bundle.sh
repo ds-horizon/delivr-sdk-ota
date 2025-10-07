@@ -75,9 +75,4 @@ if ! [[ -z "${MAKE_SOURCEMAP}" ]]; then
   echo "Wrote compose output ${COMPOSED_SOURCEMAP_FILE}"
   # These ones are no longer required
   rm ${JS_SOURCEMAP_FILE} ${HBC_SOURCEMAP_FILE}
-  # For android and iOS store source map outside of assets folder so that it will not included in APK & IPA
-  # Move sourcemaps only when source and destination path are not same.
-  if [[ "$COMPOSED_SOURCEMAP_FILE" != "$SOURCE_MAP_PATH/index.${PLATFORM}.bundle.json" ]]; then
-      mv "$COMPOSED_SOURCEMAP_FILE" "$SOURCE_MAP_PATH"
-  fi
 fi
