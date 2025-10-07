@@ -65,6 +65,11 @@ HBC_SOURCEMAP_FILE="${JS_BUNDLE_FILE}.hbc.map" # NOTE: This is by convention alw
 echo "Replacing JS bundle with HBC"
 mv ${HBC_TEMP_FILE} ${JS_BUNDLE_FILE}
 
+# Clean up sourcemap if not required
+if [[ -z "${MAKE_SOURCEMAP}" ]]; then
+  rm ${HBC_SOURCEMAP_FILE}
+fi
+
 #####################################################################
 # Compose sourcemaps if required
 

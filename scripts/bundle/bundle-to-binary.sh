@@ -36,11 +36,7 @@ if [[ "${OSTYPE}" == "darwin"* ]]; then
 fi
 HERMESC="node_modules/react-native/sdks/hermesc/${HERMES_OS_BIN}/hermesc"
 
-if [[ -z "${MAKE_SOURCEMAP}" ]]; then
-  HBC_SOURCEMAP_FLAGS=""
-else
-  HBC_SOURCEMAP_FLAGS="-output-source-map"
-fi
+HBC_SOURCEMAP_FLAGS="-output-source-map"
 
 # create binary bundle from js bundle (-O=optmised, -w=no-warnings)
 ${HERMESC} -emit-binary -out ${HBC_BUNDLE_FILE} ${JS_BUNDLE_FILE} -O -w ${HBC_SOURCEMAP_FLAGS}

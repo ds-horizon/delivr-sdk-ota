@@ -19,7 +19,7 @@ program
   .option('--bundle-path <path>', 'Directory to place the bundle in', '.dota')
   .option('--assets-path <path>', 'Directory to place assets in', '.dota')
   .option('--sourcemap-path <path>', 'Directory to place sourcemaps in', '.dota')
-  .option('--make-sourcemap <boolean>', 'Generate sourcemap: true or false', 'true')
+  .option('--make-sourcemap <boolean>', 'Generate sourcemap: true or false', 'false')
     .option('--entry-file <file>', 'Entry file', 'index.ts')
     .option('--dev <boolean>', 'Development mode', 'false')
     .allowUnknownOption() // Allow additional options to be passed to react-native bundle
