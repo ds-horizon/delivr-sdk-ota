@@ -43,12 +43,13 @@ In order to integrate CodePush into your Android project, please perform the fol
         object : DefaultReactNativeHost(this) {
             ...
             // 2. Add Codepush package for manual linking
-              add(CodePush(
-                resources.getString(R.string.CodePushDeploymentKey),
-                applicationContext,
-                BuildConfig.DEBUG,
-                resources.getString(R.string.CodePushServerUrl)
-              ))
+              add(
+                CodePush.getInstance(
+                  resources.getString(R.string.CodePushDeploymentKey),
+                  applicationContext,
+                  BuildConfig.DEBUG
+                )
+              )
             // 3. Override the getJSBundleFile method in order to let
             // the CodePush runtime determine where to get the JS
             // bundle location from on each app start
@@ -71,11 +72,10 @@ In order to integrate CodePush into your Android project, please perform the fol
         private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
             ...
             // 2. Add Codepush package for manual linking
-            packages.add(new CodePush(
+            packages.add(CodePush.getInstance(
                 getResources().getString(R.string.CodePushDeploymentKey),
                 getApplicationContext(),
                 BuildConfig.DEBUG,
-                getResources().getString(R.string.CodePushServerUrl)
             ));
             // 3. Override the getJSBundleFile method in order to let
             // the CodePush runtime determine where to get the JS
