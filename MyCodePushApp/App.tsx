@@ -11,7 +11,8 @@ import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import codePush from "@d11/dota";
+import { withCodePush } from './codepush/withCodePush';
+import { getCodePushConfig } from './codepush/config';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -41,6 +42,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-});
+}); 
+const env = 'staging';
 
-export default codePush(App);
+export default withCodePush(getCodePushConfig(env))(App);

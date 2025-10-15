@@ -29,6 +29,7 @@ npm-debug.log
 # Don't publish example apps
 Examples/
 Recipes/
+MyCodePushApp/
 
 # Don't publish testing code
 bin/
