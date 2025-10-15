@@ -4,6 +4,7 @@ require Pod::Executable.execute_command('node', ['-p',
     "react-native/scripts/react_native_pods.rb",
     {paths: [process.argv[1]]},
   )', __dir__]).strip
+require_relative '../node_modules/@d11/dota/ios/scripts/dota_pod_helpers.rb'
 
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
@@ -31,5 +32,6 @@ target 'MyCodePushApp' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+    dota_post_install(installer, 'MyCodePushApp', File.expand_path(__dir__))
   end
 end

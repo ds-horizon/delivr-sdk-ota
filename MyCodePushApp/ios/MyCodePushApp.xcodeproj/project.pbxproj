@@ -112,6 +112,7 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
 				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
+				383B7EB1601E20672905D86E /* [Dota] Copy CodePush Bundle */,
 			);
 			buildRules = (
 			);
@@ -199,6 +200,24 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MyCodePushApp/Pods-MyCodePushApp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		383B7EB1601E20672905D86E /* [Dota] Copy CodePush Bundle */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Dota] Copy CodePush Bundle";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\nBUNDLE_NAME=\"main\"\nDEST=\"$CONFIGURATION_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\nBUNDLE_FILE=\"$DEST/$BUNDLE_NAME.jsbundle\"\n\necho \"Dota - BUNDLE_FILE: $BUNDLE_FILE\"\necho \"Dota - CONFIGURATION: $CONFIGURATION\"\n\nif [[ \"$CONFIGURATION\" != \"Release\" ]]; then\n    echo \"Skipping CodePush bundle copy for ${CONFIGURATION} build\"\n    exit 0\nfi\n\n\nif [[ ! -f \"$BUNDLE_FILE\" ]]; then\n    echo \"Warning: Bundle not found at $BUNDLE_FILE\"\n    exit 0\nfi\n\nAPP_ROOT=\"$SRCROOT/..\"\nDOTA_DIR=\"$APP_ROOT/.dota\"\nCODEPUSH_DIR=\"$DOTA_DIR/ios\"\n\n# Create .dota and ios directories if they don't exist\necho \"Dota - Creating directory structure at $CODEPUSH_DIR\"\nmkdir -p \"$CODEPUSH_DIR\"\n\necho \"Dota - Copying bundle to CodePush directory\"\ncp \"$BUNDLE_FILE\" \"$CODEPUSH_DIR/$BUNDLE_NAME.jsbundle\"\n\nif [[ -d \"$DEST/assets\" ]]; then\n    echo \"Dota - Copying assets to CodePush directory\"\n    cp -R \"$DEST/assets\" \"$CODEPUSH_DIR/\"\nfi\n";
 		};
 		C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;

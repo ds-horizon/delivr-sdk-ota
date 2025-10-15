@@ -387,16 +387,16 @@ async function syncInternal(options = {}, syncStatusChangeCallbackFunction, down
         log("Status: Downloading package.");
         break;
       case CodePush.SyncStatus.PATCH_APPLIED_SUCCESS:
-        log("Status: Patch applied successfully.");
+        log("Status: Patch applied success.");
         break;
       case CodePush.SyncStatus.DOWNLOAD_REQUEST_SUCCESS:
-        log("Status: Download request successfully.");
+        log("Status: Download request success.");
         break;
       case CodePush.SyncStatus.UNZIPPED_SUCCESS:
-        log("Status: Unzipped successfully.");
+        log("Status: Unzipped success.");
         break;
       case CodePush.SyncStatus.DECOMPRESSED_SUCCESS:
-        log("Status: Decompressed successfully.");
+        log("Status: Decompressed success.");
         break;
       case CodePush.SyncStatus.UPDATE_AVAILABLE:
         log("Status: Update available.");
