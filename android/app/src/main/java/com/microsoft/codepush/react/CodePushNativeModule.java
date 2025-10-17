@@ -452,6 +452,7 @@ public class CodePushNativeModule extends ReactContextBaseJavaModule {
             configMap.putString("clientUniqueId", mClientUniqueId);
             configMap.putString("deploymentKey", mCodePush.getDeploymentKey());
             configMap.putString("serverUrl", mCodePush.getServerUrl());
+            configMap.putString("packageName", getReactApplicationContext().getPackageName());
 
             // The binary hash may be null in debug builds
             if (mBinaryContentsHash != null) {

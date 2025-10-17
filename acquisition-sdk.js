@@ -52,6 +52,7 @@ class AcquisitionManager {
         this._clientUniqueId = configuration.clientUniqueId;
         this._deploymentKey = configuration.deploymentKey;
         this._ignoreAppVersion = configuration.ignoreAppVersion;
+        this._packageName = configuration.packageName;
     }
 
     isRecoverable = (statusCode) => statusCode >= 500 || statusCode === 408 || statusCode === 429;
@@ -84,7 +85,7 @@ class AcquisitionManager {
 
         var requestUrl = this._serverUrl + this._publicPrefixUrl + "update_check?" + queryStringify(updateRequest);
 
-        this._httpRequester.request(Http.Verb.GET, requestUrl, (error, response) => {
+        this._httpRequester.request(Http.Verb.GET, requestUrl, this._packageName, (error, response) => {
             if (error) {
                 callback(error, null);
                 return;
@@ -186,7 +187,7 @@ class AcquisitionManager {
 
         callback = typeof arguments[arguments.length - 1] === "function" && arguments[arguments.length - 1];
 
-        this._httpRequester.request(Http.Verb.POST, url, JSON.stringify(body), (error, response) => {
+        this._httpRequester.request(Http.Verb.POST, url, this._packageName, JSON.stringify(body), (error, response) => {
             if (callback) {
                 if (error) {
                     callback(error, null);
@@ -219,7 +220,7 @@ class AcquisitionManager {
             label: downloadedPackage.label
         };
 
-        this._httpRequester.request(Http.Verb.POST, url, JSON.stringify(body), (error, response) => {
+        this._httpRequester.request(Http.Verb.POST, url, this._packageName, JSON.stringify(body), (error, response) => {
             if (callback) {
                 if (error) {
                     callback(error, null);
