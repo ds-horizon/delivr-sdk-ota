@@ -13,6 +13,7 @@ static NSString * const ClientUniqueIDConfigKey = @"clientUniqueId";
 static NSString * const DeploymentKeyConfigKey = @"deploymentKey";
 static NSString * const ServerURLConfigKey = @"serverUrl";
 static NSString * const PublicKeyKey = @"publicKey";
+static NSString * const PackageNameConfigKey = @"packageName";
 
 + (instancetype)current
 {
@@ -57,6 +58,10 @@ static NSString * const PublicKeyKey = @"publicKey";
     if (clientUniqueId) [_configDictionary setObject:clientUniqueId forKey:ClientUniqueIDConfigKey];
     if (deploymentKey) [_configDictionary setObject:deploymentKey forKey:DeploymentKeyConfigKey];
     if (publicKey) [_configDictionary setObject:publicKey forKey:PublicKeyKey];
+    NSString *bundleId = [[NSBundle mainBundle] bundleIdentifier];
+    if (bundleId) {
+        [_configDictionary setObject:bundleId forKey:PackageNameConfigKey];
+    }
 
     return self;
 }

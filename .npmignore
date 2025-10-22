@@ -29,6 +29,7 @@ npm-debug.log
 # Don't publish example apps
 Examples/
 Recipes/
+MyCodePushApp/
 
 # Don't publish testing code
 bin/
@@ -101,3 +102,16 @@ packages/
 
 .watchmanconfig
 
+.azurepipelines/
+.config/
+windows/
+windows-legacy/
+docs/
+test/
+code-push-plugin-testing-framework/
+.gitignore
+.npmignore
+.prettierrc
+.prettierignore
+.prettierignore
+*.tgz

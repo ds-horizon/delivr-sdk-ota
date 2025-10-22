@@ -5,11 +5,14 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.Settings;
 import android.view.View;
+import android.view.Choreographer;
 
 import com.facebook.react.ReactApplication;
+import com.facebook.react.ReactDelegate;
+import com.facebook.react.ReactHost;
 import com.facebook.react.ReactInstanceManager;
+import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactRootView;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.JSBundleLoader;
@@ -20,9 +23,9 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.modules.core.ChoreographerCompat;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.facebook.react.modules.core.ReactChoreographer;
+import com.facebook.react.common.annotations.UnstableReactNativeAPI;
+import com.facebook.react.runtime.ReactHostDelegate;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.lang.reflect.Method;
 
 public class CodePushNativeModule extends ReactContextBaseJavaModule {
     private String mBinaryContentsHash = null;
@@ -127,15 +131,40 @@ public class CodePushNativeModule extends ReactContextBaseJavaModule {
             }
             CodePushUtils.log("Bundle is loaded");
             CodePushUtils.log("latestJSBundleLoader :: " + latestJSBundleLoader);
-            Field bundleLoaderField = instanceManager.getClass().getDeclaredField("mBundleLoader");
-            CodePushUtils.log("bundleLoaderField :: " + bundleLoaderField);
-            bundleLoaderField.setAccessible(true);
-            bundleLoaderField.set(instanceManager, latestJSBundleLoader);
-            CodePushUtils.log("Bundle is set");
+            ReactHost reactHost = resolveReactHost();
+            if (reactHost == null) {
+                // Bridge, Old Architecture and RN < 0.74 (we support Bridgeless >= 0.74)
+                setJSBundleLoaderBridge(instanceManager, latestJSBundleLoader);
+                return;
+            }
+
+            // Bridgeless (RN >= 0.74)
+            setJSBundleLoaderBridgeless(reactHost, latestJSBundleLoader);
         } catch (Exception e) {
             CodePushUtils.log("Unable to set JSBundle - CodePush may not support this version of React Native");
             throw new IllegalAccessException("Could not setJSBundle");
         }
+    }
+
+    private void setJSBundleLoaderBridge(ReactInstanceManager instanceManager, JSBundleLoader latestJSBundleLoader) throws NoSuchFieldException, IllegalAccessException {
+        Field bundleLoaderField = instanceManager.getClass().getDeclaredField("mBundleLoader");
+        CodePushUtils.log("bundleLoaderField :: " + bundleLoaderField);
+        bundleLoaderField.setAccessible(true);
+        bundleLoaderField.set(instanceManager, latestJSBundleLoader);
+        CodePushUtils.log("Bundle is set");
+    }
+
+    @kotlin.OptIn(markerClass = UnstableReactNativeAPI.class)
+    private void setJSBundleLoaderBridgeless(ReactHost reactHost, JSBundleLoader latestJSBundleLoader) throws NoSuchFieldException, IllegalAccessException {
+        Field mReactHostDelegateField = reactHost.getClass().getDeclaredField("mReactHostDelegate");
+        mReactHostDelegateField.setAccessible(true);
+        ReactHostDelegate reactHostDelegate = (ReactHostDelegate) mReactHostDelegateField.get(reactHost);
+        assert reactHostDelegate != null;
+        Field jsBundleLoaderField = reactHostDelegate.getClass().getDeclaredField("jsBundleLoader");
+        CodePushUtils.log("jsBundleLoaderField :: " + jsBundleLoaderField);
+        jsBundleLoaderField.setAccessible(true);
+        jsBundleLoaderField.set(reactHostDelegate, latestJSBundleLoader);
+        CodePushUtils.log("Bundle is set");
     }
 
     private void loadBundle() {
@@ -166,13 +195,22 @@ public class CodePushNativeModule extends ReactContextBaseJavaModule {
                 @Override
                 public void run() {
                     try {
-                        // We don't need to resetReactRootViews anymore 
-                        // due the issue https://github.com/facebook/react-native/issues/14533
-                        // has been fixed in RN 0.46.0
-                        //resetReactRootViews(instanceManager);
+                        // reload method introduced in RN 0.74 (https://github.com/reactwg/react-native-new-architecture/discussions/174)
+                        // so, we need to check if reload method exists and call it
+                        try {
+                            ReactDelegate reactDelegate = resolveReactDelegate();
+                            if (reactDelegate == null) {
+                                throw new NoSuchMethodException("ReactDelegate doesn't have reload method in RN < 0.74");
+                            }
 
-                        instanceManager.recreateReactContextInBackground();
-                        CodePushUtils.log("Initiliase Update and Restart called after creating react context in background ");
+                            resetReactRootViews(reactDelegate);
+
+                            Method reloadMethod = reactDelegate.getClass().getMethod("reload");
+                            reloadMethod.invoke(reactDelegate);
+                        } catch (NoSuchMethodException e) {
+                            // RN < 0.74 calls ReactInstanceManager.recreateReactContextInBackground() directly
+                            instanceManager.recreateReactContextInBackground();
+                        }
                         mCodePush.initializeUpdateAfterRestart();
                         CodePushUtils.log("Initiliase Update and Restart ");
                     } catch (Exception e) {
@@ -191,18 +229,19 @@ public class CodePushNativeModule extends ReactContextBaseJavaModule {
         }
     }
 
-    // This workaround has been implemented in order to fix https://github.com/facebook/react-native/issues/14533
-    // resetReactRootViews allows to call recreateReactContextInBackground without any exceptions
-    // This fix also relates to https://github.com/microsoft/react-native-code-push/issues/878
-    private void resetReactRootViews(ReactInstanceManager instanceManager) throws NoSuchFieldException, IllegalAccessException {
-        Field mAttachedRootViewsField = instanceManager.getClass().getDeclaredField("mAttachedRootViews");
-        mAttachedRootViewsField.setAccessible(true);
-        List<ReactRootView> mAttachedRootViews = (List<ReactRootView>)mAttachedRootViewsField.get(instanceManager);
-        for (ReactRootView reactRootView : mAttachedRootViews) {
-            reactRootView.removeAllViews();
-            reactRootView.setId(View.NO_ID);
+    // Fix freezing that occurs when reloading the app (RN >= 0.77.1 Old Architecture)
+    //  - "Trying to add a root view with an explicit id (11) already set.
+    //     React Native uses the id field to track react tags and will overwrite this field.
+    //     If that is fine, explicitly overwrite the id field to View.NO_ID before calling addRootView."
+    private void resetReactRootViews(ReactDelegate reactDelegate) {
+        ReactActivity currentActivity = (ReactActivity) getCurrentActivity();
+        if (currentActivity != null) {
+            ReactRootView reactRootView = reactDelegate.getReactRootView();
+            if (reactRootView != null) {
+                reactRootView.removeAllViews();
+                reactRootView.setId(View.NO_ID);
+            }
         }
-        mAttachedRootViewsField.set(instanceManager, mAttachedRootViews);
     }
 
     private void clearLifecycleEventListener() {
@@ -211,6 +250,36 @@ public class CodePushNativeModule extends ReactContextBaseJavaModule {
             getReactApplicationContext().removeLifecycleEventListener(mLifecycleEventListener);
             CodePushUtils.log("clearing LifecycleEventListener ::");
             mLifecycleEventListener = null;
+        }
+    }
+
+    private ReactDelegate resolveReactDelegate() {
+        ReactActivity currentActivity = (ReactActivity) getCurrentActivity();
+        if (currentActivity == null) {
+            return null;
+        }
+
+        try {
+            Method getReactDelegateMethod = currentActivity.getClass().getMethod("getReactDelegate");
+            return (ReactDelegate) getReactDelegateMethod.invoke(currentActivity);
+        } catch (Exception e) {
+            // RN < 0.74 doesn't have getReactDelegate method
+            return null;
+        }
+    }
+
+    private ReactHost resolveReactHost() {
+        ReactDelegate reactDelegate = resolveReactDelegate();
+        if (reactDelegate == null) {
+            return null;
+        }
+
+        try {
+            Field reactHostField = reactDelegate.getClass().getDeclaredField("mReactHost");
+            reactHostField.setAccessible(true);
+            return (ReactHost) reactHostField.get(reactDelegate);
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -310,7 +379,7 @@ public class CodePushNativeModule extends ReactContextBaseJavaModule {
                     JSONObject mutableUpdatePackage = CodePushUtils.convertReadableToJsonObject(updatePackage);
                     CodePushUtils.log("mutableUpdatePackage in downloadUpdate :: "+ mutableUpdatePackage);
                     CodePushUtils.setJSONValueForKey(mutableUpdatePackage, CodePushConstants.BINARY_MODIFIED_TIME_KEY, "" + mCodePush.getBinaryResourcesModifiedTime());
-                    mUpdateManager.downloadPackage(mutableUpdatePackage, mCodePush.getAssetsBundleFileName(), new DownloadProgressCallback() {
+                    mUpdateManager.downloadPackage(getReactApplicationContext(), mutableUpdatePackage, mCodePush.getAssetsBundleFileName(), new DownloadProgressCallback() {
                         private boolean hasScheduledNextFrame = false;
                         private DownloadProgress latestDownloadProgress = null;
 
@@ -335,7 +404,8 @@ public class CodePushNativeModule extends ReactContextBaseJavaModule {
                             getReactApplicationContext().runOnUiQueueThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    ReactChoreographer.getInstance().postFrameCallback(ReactChoreographer.CallbackType.TIMERS_EVENTS, new ChoreographerCompat.FrameCallback() {
+                                    //ChoreographerCompat was removed in rn v0.80 [https://github.com/facebook/react-native/issues/52953]
+                                    Choreographer.getInstance().postFrameCallback(new Choreographer.FrameCallback() {
                                         @Override
                                         public void doFrame(long frameTimeNanos) {
                                             if (!latestDownloadProgress.isCompleted()) {
@@ -382,6 +452,7 @@ public class CodePushNativeModule extends ReactContextBaseJavaModule {
             configMap.putString("clientUniqueId", mClientUniqueId);
             configMap.putString("deploymentKey", mCodePush.getDeploymentKey());
             configMap.putString("serverUrl", mCodePush.getServerUrl());
+            configMap.putString("packageName", getReactApplicationContext().getPackageName());
 
             // The binary hash may be null in debug builds
             if (mBinaryContentsHash != null) {
