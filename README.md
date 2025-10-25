@@ -67,7 +67,7 @@ The simplest way to get started:
 
 By default, DOTA will check for updates on every app start. If an update is available, it will be silently downloaded, and installed the next time the app is restarted (either explicitly by the end user or by the OS), which ensures the least invasive experience for your end users. If an available update is mandatory, then it will be installed immediately, ensuring that the end user gets it as soon as possible.
 
-If you would like your app to discover updates more quickly, you can refer to the [`codePush()`](docs/api-js.md#codepush) API reference
+If you would like your app to discover updates more quickly, you can refer to the [DOTA API reference](docs/api-js.md#dota) 
 
 ## Creating the JavaScript bundle (Hermes)
 

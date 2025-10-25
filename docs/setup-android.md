@@ -92,7 +92,7 @@ In order to integrate DOTA into your Android project, please perform the followi
 
    To let the DOTA runtime know which deployment it should query for updates, open your app's `strings.xml` file and add a new string named `CodePushDeploymentKey`, whose value is the key of the deployment you want to configure this app against (like the key for the `Staging` deployment for the `FooBar` app). You can retrieve this value using DOTA dashboard and copying the value of the `Key` column which corresponds to the deployment you want to use.
 
-   In order to effectively make use of the `Staging` and `Production` deployments that were created along with your DOTA app, refer to the [multi-deployment testing](../README.md#multi-deployment-testing) docs below before actually moving your app's usage of DOTA into production.
+   In order to effectively make use of the `Staging` and `Production` deployments that were created along with your DOTA app, refer to the [multi-deployment testing](./multi-deployment-testing.md) docs below before actually moving your app's usage of DOTA into production.
 
    Your `strings.xml` should looks like this:
 
