@@ -1,73 +1,32 @@
 # React Native Module for OTA Updates
+
+Instantly deliver JS and asset updates to your React Native apps. Know more about [OTA Updates](docs/ota-updates.md)
 <!-- React Native Catalog -->
 
-> ⚠️ This SDK currently supports only the React Native Old Architecture. We are working on providing support for New Architecture (Fabric/TurboModules).
-
-* [Problem Statement](#problem-statement)
-* [What is Dota?](#what-is-dota)
-* [How does it work?](#how-does-it-work)
 * [Getting Started](#getting-started)
     * [iOS Setup](docs/setup-ios.md)
     * [Android Setup](docs/setup-android.md)
 * [Usage](#usage)
 * [Creating the JavaScript bundle](#creating-the-javascript-bundle-hermes)
 * [Releasing Updates](#releasing-updates)
-* [Store Guideline Compliance](#store-guideline-compliance)
-* [Supported Components](#supported-components)
-* [Multi-Deployment Testing](#multi-deployment-testing)
-    * [Android](docs/multi-deployment-testing-android.md)
-    * [iOS](docs/multi-deployment-testing-ios.md)
-* [Dynamic Deployment Assignment](#dynamic-deployment-assignment)
+* [Debugging / Troubleshooting](#debugging--troubleshooting)
+* [Advanced Topics](#advanced-topics)
+  * [Store Guideline Compliance](docs/store*guidelines.md)
+  * [Multi-Deployment Testing](docs/multi-deployment-testing.md)
+  * [Dynamic Deployment Assignment](docs/dynamic-deployment-assignment.md)
+  * [Supported Components](docs/supported-components.md)
 * [API Reference](#api-reference)
     * [JavaScript API](docs/api-js.md)
     * [Objective-C API Reference (iOS)](docs/api-ios.md)
     * [Swift API Reference (iOS)](docs/api-ios-swift.md)
     * [Java API Reference (Android)](docs/api-android.md)
-* [Debugging / Troubleshooting](#debugging--troubleshooting)
 * [TypeScript Consumption](#typescript-consumption)
 
 <!-- React Native Catalog -->
 
-## Problem Statement
-
-Releasing updates for mobile apps is slow and cumbersome. Even small fixes or UI tweaks require pushing a new binary to the App Store or Play Store, followed by lengthy review cycles and user updates.
-
-* Multiple days review cycles on app stores slows your release velocity
-
-* Manual release overhead makes hotfixes painful
-
-* Bug-induced releases damages user experience and retention
-
-* Lost developer velocity due to repeated native builds
-
-## What is DOTA?
-
-DOTA is Dream11’s Over-The-Air (OTA) solution for React Native apps.
-It allows you to deliver JavaScript and asset updates instantly — without re-submitting to app stores.
-
-DOTA brings:
-
-* Instant updates: Push JS changes in minutes
-
-* Automatic rollbacks: Stay safe from bad releases
-
-* Staged rollouts: Gradual and controlled deployment
-
-* Enterprise scale: Battle-tested at Dream11
-
-## How does it work?
-
-A React Native app is composed of JavaScript files and any accompanying [images](https://reactnative.dev/docs/image), which are bundled together by the [metro bundler](https://github.com/facebook/metro) and distributed as part of a platform-specific binary (i.e. an `.ipa` or `.apk` file). Once the app is released, updating either the JavaScript code (e.g. making bug fixes, adding new features) or image assets, requires you to recompile and redistribute the entire binary, which of course, includes any review time associated with the store(s) you are publishing to.
-
-DOTA helps get product improvements in front of your end users instantly, by keeping your JavaScript and images synchronized with updates you release to the DOTA server. This way, your app gets the benefits of an offline mobile experience, as well as the "web-like" agility of side-loading updates as soon as they are available. It's a win-win!
-
-In order to ensure that your end users always have a functioning version of your app, the DOTA plugin maintains a copy of the previous update, so that in the event that you accidentally push an update which includes a crash, it can automatically roll back. This way, you can rest assured that your newfound release agility won't result in users becoming blocked before you have a chance to roll back on the server. It's a win-win-win!
-
-*Note: Any product changes which touch native code (e.g. modifying your `AppDelegate.m`/`MainActivity.java` file, adding a new plugin) cannot be distributed via DOTA, and therefore, must be updated via the appropriate store(s).*
-
 ## Getting Started
 
-You can add DOTA to your React Native app by running the following command from within your app's root directory:
+You can add [DOTA](docs/ota-updates.md) to your React Native app by running the following command from within your app's root directory:
 
 * Yarn
 ```shell
@@ -92,7 +51,7 @@ The only thing left is to add the necessary code to your app to control the foll
 
 2. When an update is available, how to present it to the end user?
 
-The simplest way to do this is to "CodePush-ify" your app's root component.
+The simplest way to get started:
 
 * Wrap your root component with the `codePush`:
 
@@ -108,49 +67,7 @@ The simplest way to do this is to "CodePush-ify" your app's root component.
 
 By default, DOTA will check for updates on every app start. If an update is available, it will be silently downloaded, and installed the next time the app is restarted (either explicitly by the end user or by the OS), which ensures the least invasive experience for your end users. If an available update is mandatory, then it will be installed immediately, ensuring that the end user gets it as soon as possible.
 
-If you would like your app to discover updates more quickly, you can also choose to sync up with the DOTA server every time the app resumes from the background.
-
-
-  ```javascript
-  import codePush, { CodePushOptions } from '@d11/dota';
-
-  let codePushOptions: CodePushOptions = { checkFrequency: codePush.CheckFrequency.ON_APP_RESUME };
-
-  function MyApp {
-    ...
-  }
-
-  export default codePush(codePushOptions)(MyApp);
-  ```
-
-Alternatively, if you want fine-grained control over when the check happens (like a button press or timer interval), you can call [`CodePush.sync()`](docs/api-js.md#codepushsync) at any time with your desired `SyncOptions`, and optionally turn off CodePush's automatic checking by specifying a manual `checkFrequency`:
-
-```javascript
-import codePush, { CodePushOptions } from '@d11/dota';
-
-let codePushOptions: CodePushOptions = { checkFrequency: codePush.CheckFrequency.MANUAL };
-
-function MyApp {
-  const onButtonPress = () => {
-    codePush.sync({
-      updateDialog: true,
-      installMode: codePush.InstallMode.IMMEDIATE,
-    });
-  };
-
-  return (
-    <View>
-      <TouchableOpacity onPress={onButtonPress}>
-        <Text>Check for updates</Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
-
-export default codePush(codePushOptions)(MyApp);
-```
-
-If you would like to display an update confirmation dialog (an "active install"), configure when an available update is installed (like force an immediate restart) or customize the update experience in any other way, refer to the [`codePush()`](docs/api-js.md#codepush) API reference for information on how to tweak this default behavior.
+If you would like your app to discover updates more quickly, you can refer to the [`codePush()`](docs/api-js.md#codepush) API reference
 
 ## Creating the JavaScript bundle (Hermes)
 
@@ -261,116 +178,6 @@ If you run into any issues, check out the [troubleshooting](#debugging--troubles
 
 *NOTE: DOTA updates should be tested in modes other than Debug mode. In Debug mode, React Native app always downloads JS bundle generated by packager, so JS bundle downloaded by DOTA does not apply.*
 
-### Store Guideline Compliance
-
-Android Google Play and iOS App Store have corresponding guidelines that have rules you should be aware of before integrating the DOTA solution within your application.
-
-#### Google play
-
-Third paragraph of [Device and Network Abuse](https://support.google.com/googleplay/android-developer/answer/9888379?hl=en) topic describe that updating source code by any method other than Google Play's update mechanism is restricted. But this restriction does not apply to updating javascript bundles.
-> This restriction does not apply to code that runs in a virtual machine and has limited access to Android APIs (such as JavaScript in a webview or browser).
-
-That fully allow DOTA as it updates just JS bundles and can't update native code part.
-
-#### App Store
-
-Paragraph **3.3.2**, since back in 2015's [Apple Developer Program License Agreement](https://developer.apple.com/programs/ios/information/) fully allowed performing over-the-air updates of JavaScript and assets -  and in its latest version (20170605) [downloadable here](https://developer.apple.com/terms/) this ruling is even broader:
-
-> Interpreted code may be downloaded to an Application but only so long as such code: (a) does not change the primary purpose of the Application by providing features or functionality that are inconsistent with the intended and advertised purpose of the Application as submitted to the App Store, (b) does not create a store or storefront for other code or applications, and (c) does not bypass signing, sandbox, or other security features of the OS.
-
-DOTA allows you to follow these rules in full compliance so long as the update you push does not significantly deviate your product from its original App Store approved intent.
-
-To further remain in compliance with Apple's guidelines we suggest that App Store-distributed apps don't enable the `updateDialog` option when calling `sync`, since in the [App Store Review Guidelines](https://developer.apple.com/app-store/review/guidelines/) it is written that:
-
-> Apps must not force users to rate the app, review the app, download other apps, or other similar actions in order to access functionality, content, or use of the app.
-
-This is not necessarily the case for `updateDialog`, since it won't force the user to download the new version, but at least you should be aware of that ruling if you decide to show it.
-
-## Supported Components
-
-When using the React Native assets system (i.e. using the `require("./foo.png")` syntax), the following list represents the set of core components (and props) that support having their referenced images and videos updated via DOTA:
-
-| Component                                       | Prop(s)                                  |
-|-------------------------------------------------|------------------------------------------|
-| `Image`                                         | `source`                                 |
-| `MapView.Marker` <br />*(Requires [react-native-maps](https://github.com/lelandrichardson/react-native-maps) `>=O.3.2`)* | `image`                             |
-| `ProgressViewIOS`                               | `progressImage`, `trackImage`            |
-| `TabBarIOS.Item`                                | `icon`, `selectedIcon`                   |
-| `ToolbarAndroid` <br />*(React Native 0.21.0+)* | `actions[].icon`, `logo`, `overflowIcon` |
-| `Video`                                         | `source`                                 |
-
-The following list represents the set of components (and props) that don't currently support their assets being updated via DOTA, due to their dependency on static images and videos (i.e. using the `{ uri: "foo" }` syntax):
-
-| Component   | Prop(s)                                                              |
-|-------------|----------------------------------------------------------------------|
-| `SliderIOS` | `maximumTrackImage`, `minimumTrackImage`, `thumbImage`, `trackImage` |
-| `Video`     | `source`                                                             |
-
-As new core components are released, which support referencing assets, we'll update this list to ensure users know what exactly they can expect to update using DOTA.
-
-*Note: DOTA only works with Video components when using `require` in the source prop. For example:*
-
-```javascript
-<Video source={require("./foo.mp4")} />
-```
-
-### Multi-Deployment Testing
-
-In our [getting started](#getting-started) docs, we illustrated how to configure the DOTA plugin using a specific deployment key. However, in order to effectively test your releases, it is critical that you leverage the `Staging` and `Production` deployments that are auto-generated when you first created your DOTA app (or any custom deployments you may have created). This way, you never release an update to your end users that you haven't been able to validate yourself.
-
-*NOTE: Our client-side rollback feature can help unblock users after installing a release that resulted in a crash, and server-side rollbacks allow you to prevent additional users from installing a bad release once it's been identified. However, it's obviously better if you can prevent an erroneous update from being broadly released in the first place.*
-
-Taking advantage of the `Staging` and `Production` deployments allows you to achieve a workflow like the following (feel free to customize!):
-
-1. Release a DOTA update to your `Staging` deployment using the DOTA dashboard
-
-2. Run your staging/beta build of your app, sync the update from the server, and verify it works as expected
-
-3. Promote the tested release from `Staging` to `Production` using the DOTA dashboard
-
-4. Run your production/release build of your app, sync the update from the server and verify it works as expected
-
-*NOTE: If you want to take a more cautious approach, you can even choose to perform a "staged rollout" as part of #3, which allows you to mitigate additional potential risk with the update (like did your testing in #2 touch all possible devices/conditions?) by only making the production update available to a percentage of your users. Then, after waiting for a reasonable amount of time to see if any crash reports or customer feedback comes in, you can expand it to your entire audience through DOTA dashboard.*
-
-You'll notice that the above steps refer to a "staging build" and "production build" of your app. If your build process already generates distinct binaries per "environment", then you don't need to read any further, since swapping out DOTA deployment keys is just like handling environment-specific config for any other service your app uses (like Facebook). However, if you're looking for examples (**including demo projects**) on how to setup your build process to accommodate this, then refer to the following sections, depending on the platform(s) your app is targeting:
-
-  * [Android](docs/multi-deployment-testing-android.md)
-  * [iOS](docs/multi-deployment-testing-ios.md)
-
-
-### Dynamic Deployment Assignment
-
-The above section illustrated how you can leverage multiple DOTA deployments in order to effectively test your updates before broadly releasing them to your end users. However, since that workflow statically embeds the deployment assignment into the actual binary, a staging or production build will only ever sync updates from that deployment. In many cases, this is sufficient, since you only want your team, customers, stakeholders, etc. to sync with your pre-production releases, and therefore, only they need a build that knows how to sync with staging. However, if you want to be able to perform A/B tests, or provide early access of your app to certain users, it can prove very useful to be able to dynamically place specific users (or audiences) into specific deployments at runtime.
-
-In order to achieve this kind of workflow, all you need to do is specify the deployment key you want the current user to syncronize with when calling the `codePush` method. When specified, this key will override the "default" one that was provided in your app's `Info.plist` (iOS) or `MainActivity.java` (Android) files. This allows you to produce a build for staging or production, that is also capable of being dynamically "redirected" as needed.
-
-```javascript
-// Imagine that "userProfile" is a prop that this component received
-// which includes the deployment key that the current user should use.
-codePush.sync({ deploymentKey: userProfile.CODEPUSH_KEY });
-```
-
-With that change in place, now it's just a matter of choosing how your app determines the right deployment key for the current user. In practice, there are typically two solutions for this:
-
-1. Expose a user-visible mechanism for changing deployments at any time. For example, your settings page could have a toggle for enabling "beta" access. This model works well if you're not concerned with the privacy of your pre-production updates, and you have power users that may want to opt-in to earlier (and potentially buggy) updates at their own will (kind of like Chrome channels). However, this solution puts the decision in the hands of your users, which doesn't help you perform A/B tests transparently.
-
-2. Annotate the server-side profile of your users with an additional piece of metadata that indicates the deployment they should sync with. By default, your app could just use the binary-embedded key, but after a user has authenticated, your server can choose to "redirect" them to a different deployment, which allows you to incrementally place certain users or groups in different deployments as needed. You could even choose to store the server-response in local storage so that it becomes the new default. How you store the key alongside your user's profiles is entirely up to your authentication solution (for example Auth0, Firebase, custom DB + REST API), but is generally pretty trivial to do.
-
-*NOTE: If needed, you could also implement a hybrid solution that allowed your end-users to toggle between different deployments, while also allowing your server to override that decision. This way, you have a hierarchy of "deployment resolution" that ensures your app has the ability to update itself out-of-the-box, your end users can feel rewarded by getting early access to bits, but you also have the ability to run A/B tests on your users as needed.*
-
-Since we recommend using the `Staging` deployment for pre-release testing of your updates (as explained in the previous section), it doesn't neccessarily make sense to use it for performing A/B tests on your users, as opposed to allowing early-access (as explained in option #1 above). Therefore, we recommend making full use of custom app deployments, so that you can segment your users however makes sense for your needs. For example, you could create long-term or even one-off deployments, release a variant of your app to it, and then place certain users into it in order to see how they engage.
-
-*NOTE: The total user count that is reported in your deployment's "Install Metrics" will take into account users that have "switched" from one deployment to another. For example, if your `Production` deployment currently reports having 1 total user, but you dynamically switch that user to `Staging`, then the `Production` deployment would report 0 total users, while `Staging` would report 1 (the user that just switched). This behavior allows you to accurately track your release adoption, even in the event of using a runtime-based deployment redirection solution.*
-
----
-
-## API Reference
-
-* [JavaScript API](docs/api-js.md)
-* [Objective-C API Reference (iOS)](docs/api-ios.md)
-* [Swift API Reference (iOS)](docs/api-ios-swift.md)
-* [Java API Reference (Android)](docs/api-android.md)
-
 ### Debugging / Troubleshooting
 
 The `sync` method includes a lot of diagnostic logging out-of-the-box, so if you're encountering an issue when using it, the best thing to try first is examining the output logs of your app. This will tell you whether the app is configured correctly (like can the plugin find your deployment key?), if the app is able to reach the server, if an available update is being discovered, if the update is being successfully downloaded/installed, etc.
@@ -403,6 +210,20 @@ Now you'll be able to see DOTA logs in either debug or release mode, on both iOS
 | I've released an update for iOS but my Android app also shows an update and it breaks it | Be sure you have different deployment keys for each platform in order to receive updates correctly |
 | I've released new update but changes are not reflected | Be sure that you are running app in modes other than Debug. In Debug mode, React Native app always downloads JS bundle generated by packager, so JS bundle downloaded by DOTA does not apply.
 | No JS bundle is being found when running your app against the iOS simulator | By default, React Native doesn't generate your JS bundle when running against the simulator. Therefore, if you're using `[CodePush bundleURL]`, and targetting the iOS simulator, you may be getting a `nil` result. This issue will be fixed in RN 0.22.0, but only for release builds. You can unblock this scenario right now by making [this change](https://github.com/facebook/react-native/commit/9ae3714f4bebdd2bcab4d7fdbf23acebdc5ed2ba) locally.
+
+
+### Advanced Topics
+- [Store Guideline Compliance](docs/store-guidelines.md)
+- [Multi-Deployment Testing](docs/multi-deployment-testing.md)
+- [Dynamic Deployment Assignment](docs/dynamic-deployment-assignment.md)
+- [Supported Components](docs/supported-components.md)
+
+## API Reference
+
+* [JavaScript API](docs/api-js.md)
+* [Objective-C API Reference (iOS)](docs/api-ios.md)
+* [Swift API Reference (iOS)](docs/api-ios-swift.md)
+* [Java API Reference (Android)](docs/api-android.md)
 
 
 ### TypeScript Consumption
