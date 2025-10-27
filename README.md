@@ -168,6 +168,24 @@ Add this line to your `android/app/build.gradle`:
 apply from: "../../node_modules/@d11/dota/android/codepush.gradle"
 ```
 
+The bundle will be automatically copied to `.dota/android` directory. When creating CodePush updates, you can enable Hermes bytecode optimization by providing the path to the base bundle (the one shipped with your app):
+
+```bash
+# Via command line
+./gradlew assembleRelease -PdotaBaseBundlePath=/path/to/base/bundle
+
+# Or via environment variable
+export DOTA_BASE_BUNDLE_PATH=/path/to/base/bundle
+./gradlew assembleRelease
+
+# Or in gradle.properties
+dotaBaseBundlePath=/path/to/base/bundle
+```
+
+This optimization uses the base bundle's bytecode structure to create a more efficient CodePush update bundle, which results in smaller patch sizes. For more details on creating optimized patches, see the [delivr-cli patch bundle documentation](https://github.com/ds-horizon/delivr-cli#patch-bundle-release).
+
+> **Note:** For your initial app release (base bundle), you don't need to set any path - the bundle will be automatically generated and copied to `.dota/android`. When creating CodePush updates later, you should set the path to this base bundle (from `.dota/android`) to enable the optimization.
+
 #### For iOS:
 
 1. Add this line at the top of your `Podfile`:
