@@ -64,7 +64,7 @@ There are two ways to generate the JavaScript bundle for DOTA:
 
 ### 1. Automated Bundle Generation (Recommended)
 
-This method automatically copies the bundle that is generated during your app's build process.
+This method automatically copies the bundle that is generated during your app's build process, streamlining the integration with DOTA and Hermes.
 
 #### For Android:
 
@@ -74,48 +74,117 @@ Add this line to your `android/app/build.gradle`:
 apply from: "../../node_modules/@d11/dota/android/codepush.gradle"
 ```
 
-The bundle will be automatically copied to `.dota/android` directory. When creating CodePush updates, you can enable Hermes bytecode optimization by providing the path to the base bundle (the one shipped with your app):
-
-```bash
-# Via command line
-./gradlew assembleRelease -PdotaBaseBundlePath=/path/to/base/bundle
-
-# Or via environment variable
-export DOTA_BASE_BUNDLE_PATH=/path/to/base/bundle
-./gradlew assembleRelease
-
-# Or in gradle.properties
-dotaBaseBundlePath=/path/to/base/bundle
-```
-
-This optimization uses the base bundle's bytecode structure to create a more efficient CodePush update bundle, which results in smaller patch sizes. For more details on creating optimized patches, see the [delivr-cli patch bundle documentation](https://github.com/ds-horizon/delivr-cli#patch-bundle-release).
-
-> **Note:** For your initial app release (base bundle), you don't need to set any path - the bundle will be automatically generated and copied to `.dota/android`. When creating CodePush updates later, you should set the path to this base bundle (from `.dota/android`) to enable the optimization.
+This setup ensures that the bundle is automatically copied to the `.dota/android` directory for further processing.
 
 #### For iOS:
 
-1. Add this line at the top of your `Podfile`:
+Add following in your `Podfile`:
 ```ruby
+# Import at top
 require_relative '../node_modules/@d11/dota/ios/scripts/dota_pod_helpers.rb'
-```
-Note: Make sure that it correctly points to node_modules path.
 
-2. In the `post_install` block of your `Podfile`, add:
-```ruby
-post_install do |installer| 
-  
-  # Add the Dota post install script
-  # Replace with your app's target name
-  dota_post_install(installer, <target>, File.expand_path(__dir__))
+# Include in the `post_install` block:
+post_install do |installer|
+  dota_post_install(installer, 'YourAppTarget', File.expand_path(__dir__))
 end
 ```
 
-3. Run pod install:
+Run:
 ```bash
 cd ios && pod install
 ```
 
-This will add a new build phase named "[Dota] Copy DOTA Bundle" that automatically handles bundle generation and copying. The bundles and assets will be generated in `.dota/<platform>` directory at your project root.
+#### Base Bytecode Optimization (New Feature)
+
+DOTA provides full bundle updates and patch bundle updates (sending only diffs instead of full bundles). Refer to the [CLI documentation](https://github.com/ds-horizon/delivr-cli#patch-bundle-release) for patch creation and release processes.
+
+DOTA's new base bytecode feature allows you to significantly reduce patch bundle sizes by using the bytecode structure from your base bundle. This requires creating a new full DOTA bundle with the flag: `--base-bytecode path/to/oldBundle`.
+
+We have automated this process, and you only need to set an environment variable, it will be handled internally.
+
+#### For Android
+
+- **Command line option:**
+  ```bash
+  ./gradlew assembleRelease -PdotaBaseBundlePath=/path/to/base/bundle
+  ```
+
+- **Environment variable:**
+  ```bash
+  # Using Gradle build commands
+  export DOTA_BASE_BUNDLE_PATH=/path/to/base/bundle
+  ./gradlew assembleRelease
+
+  # Using RN CLI
+  export DOTA_BASE_BUNDLE_PATH=/path/to/base/bundle && \
+  yarn android --mode=Release
+  ```
+
+- **gradle.properties file:**
+  ```
+  dotaBaseBundlePath=/path/to/base/bundle
+  ```
+
+#### For iOS
+
+To enable this feature, you need to create and apply a patch for `react-native-xcode.sh` as React Native doesn't directly expose this capability on iOS.
+
+- **Create and Apply Patch:**
+
+<details>
+<summary>Patch Package Setup (Skip if already installed)</summary>
+
+- **Install [patch-package](https://www.npmjs.com/package/patch-package)**:
+  ```bash
+  yarn add patch-package postinstall-postinstall --dev
+  ```
+
+- **Add postinstall script**:
+  ```json
+  {
+    "scripts": {
+      "postinstall": "patch-package"
+    }
+  }
+  ```
+
+</details>
+
+- **Modify and Create Patch**:
+  Locate `react-native-xcode.sh` in your `node_modules/react-native/scripts`. Edit it to add support for base bytecode:
+
+  ```bash
+  # Inside react-native-xcode.sh
+  BASE_BYTECODE_PATH=""
+  echo "DOTA_BASE_BUNDLE_PATH: $DOTA_BASE_BUNDLE_PATH"
+  if [[ ! -z $DOTA_BASE_BUNDLE_PATH ]]; then
+    BASE_BYTECODE_PATH="--base-bytecode $DOTA_BASE_BUNDLE_PATH"
+  fi
+
+  "$HERMES_CLI_PATH" -emit-binary -max-diagnostic-width=80 $EXTRA_COMPILER_ARGS -out "$DEST/$BUNDLE_NAME.jsbundle" "$BUNDLE_FILE" $BASE_BYTECODE_PATH
+  ```
+
+  Create the patch using:
+  ```bash
+  yarn patch-package react-native
+  ```
+
+- **Apply the patch**:
+  Run `yarn postinstall` or `npm run postinstall`.
+
+**Environment Configuration:**
+
+- **In `.xcode.env`:**
+  ```bash
+  export DOTA_BASE_BUNDLE_PATH=/path/to/base.bundle
+  ```
+
+- **Directly within a terminal session:**
+  ```bash
+  export DOTA_BASE_BUNDLE_PATH=/path/to/base.bundle && yarn ios --mode=Release
+  ```
+
+> Note: For your initial app release (base bundle), you don't need to set any path - the bundle will be automatically generated and copied to .dota/android. When creating CodePush updates later, you should set the path to this base bundle (from .dota/android) to enable the optimization.
 
 ### 2. Manual Bundle Generation (Using CLI Tool)
 
