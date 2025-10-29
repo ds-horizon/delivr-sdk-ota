@@ -16,9 +16,9 @@ program
   .command('bundle')
   .description('Generate a Hermes bundle and assets, compile to HBC and optionally emit sourcemap')
   .requiredOption('--platform <platform>', 'Specify platform: android or ios')
-  .option('--bundle-path <path>', 'Directory to place the bundle in', '.dota')
-  .option('--assets-path <path>', 'Directory to place assets in', '.dota')
-  .option('--sourcemap-path <path>', 'Directory to place sourcemaps in', '.dota')
+  .option('--bundle-path <path>', 'Directory to place the bundle in, default is .dota/<platform>', '.dota')
+  .option('--assets-path <path>', 'Directory to place assets in, default is .dota/<platform>', '.dota')
+  .option('--sourcemap-path <path>', 'Directory to place sourcemaps in, default is .dota/<platform>', '.dota')
   .option('--make-sourcemap <boolean>', 'Generate sourcemap: true or false', 'false')
     .option('--entry-file <file>', 'Entry file', 'index.ts')
     .option('--dev <boolean>', 'Development mode', 'false')
@@ -30,6 +30,10 @@ program
         console.error('Error: Platform must be either "android" or "ios"');
         process.exit(1);
       }
+
+      options.bundlePath = path.join(options.bundlePath, options.platform);
+      options.assetsPath = path.join(options.assetsPath, options.platform);
+      options.sourcemapPath = path.join(options.sourcemapPath, options.platform);
 
       // Create necessary directories
       [options.bundlePath, options.assetsPath, options.sourcemapPath].forEach(dir => {

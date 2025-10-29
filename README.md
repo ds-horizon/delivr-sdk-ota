@@ -204,9 +204,9 @@ The CLI supports the following options:
 ```bash
 Options:
   --platform <platform>      Specify platform: android or ios (required)
-  --bundle-path <path>      Directory to place the bundle in (default: ".dota")
-  --assets-path <path>      Directory to place assets in (default: ".dota")
-  --sourcemap-path <path>   Directory to place sourcemaps in (default: ".dota")
+  --bundle-path <path>      Directory to place the bundle in, default is .dota/<platform> (default: ".dota")
+  --assets-path <path>      Directory to place assets in, default is .dota/<platform> (default: ".dota")
+  --sourcemap-path <path>   Directory to place sourcemaps in, default is .dota/<platform> (default: ".dota")
   --make-sourcemap         Generate sourcemap (default: false)
   --entry-file <file>      Entry file (default: "index.ts")
   --dev <boolean>          Development mode (default: "false")
@@ -221,19 +221,6 @@ yarn dota bundle --platform android --base-bundle-path .dota/android/index.andro
 
 Note: The base bundle path is used for Hermes bytecode optimization. If provided, the bundle will be compiled with the base bundle as reference, which can significantly reduce the size of patch bundles. For more details on creating optimized patches, see the [delivr-cli patch bundle documentation](https://github.com/ds-horizon/delivr-cli#patch-bundle-release).
 ```
-
-#### Output Files
-
-By default, the CLI will generate:
-- For Android:
-  - `.dota/index.android.bundle` - The optimized Hermes bundle
-  - `.dota/` - Directory containing any assets
-  - `.dota/index.android.bundle.json` - Sourcemap file (if --make-sourcemap is enabled)
-
-- For iOS:
-  - `.dota/main.jsbundle` - The optimized Hermes bundle
-  - `.dota/` - Directory containing any assets
-  - `.dota/main.jsbundle.json` - Sourcemap file (if --make-sourcemap is enabled)
 
 ## Releasing Updates
 
