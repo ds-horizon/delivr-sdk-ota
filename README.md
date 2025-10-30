@@ -11,34 +11,11 @@ Instantly deliver JS and asset updates to your React Native apps. Know more abou
 - **Flexible Configuration**: Leverage CLI capabilities for custom configuration needs. See [Delivr CLI](https://github.com/ds-horizon/delivr-cli) for more details.
 - **Architecture Support**: Compatible with both old and new architecture setups.
 
-## Getting Started
-
-Easily integrate [DOTA](docs/ota-updates.md) into your React Native app using the following commands:
-
-```shell
-# Yarn
-yarn add @d11/dota
-
-# NPM
-npm install @d11/dota
-```
-
-For platform-specific setup, follow the instructions below. It's recommended to manage separate DOTA applications for iOS and Android through the DOTA dashboard if targeting both platforms:
-
-- [iOS Setup](docs/setup-ios.md)
-- [Android Setup](docs/setup-android.md)
-
 ## Usage
-
-To integrate OTA updates seamlessly, follow these simple steps:
-
-1. **Define Update Policies**: Decide when to check for updates ⎼ on app start, after a button press, or at a fixed interval.
-
-2. **User Notification**: Determine how you'll inform users about updates.
 
 ### Quick Start
 
-Enhance your app effortlessly by wrapping the root component with `codePush`:
+Integrate OTA updates effortlessly by wrapping your root component with `codePush`:
 
 ```javascript
 import codePush from "@d11/dota";
@@ -52,9 +29,15 @@ export default codePush(MyApp);
 
 ### Default Behavior
 
-By default, DOTA checks for updates each time the app starts. If available, updates are downloaded silently and applied on the next restart for a smooth user experience. Mandatory updates are applied immediately to ensure critical updates reach users without delay.
+By default, DOTA checks for updates at every app start. Updates are silently downloaded and applied on the next restart for a seamless user experience. Mandatory updates are installed immediately to ensure users receive critical updates without delay.
 
-For faster update discovery, refer to the [DOTA API reference](docs/api-js.md#dota).
+### Define Update Policies
+
+- **Check Frequency**: Decide when to check for updates — on app start, after a button press, or at regular intervals.
+  
+- **User Notification**: Choose how you'll inform users about available updates.
+
+For more customization options, refer to the [DOTA API reference](docs/api-js.md#dota).
 
 ## Creating the JavaScript bundle (Hermes)
 
