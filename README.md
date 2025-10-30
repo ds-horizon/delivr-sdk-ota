@@ -2,7 +2,7 @@
 
 Instantly deliver JS and asset updates to your React Native apps. Know more about [OTA Updates](docs/ota-updates.md).
 
-## Key Features
+## 🚀 Key Features
 
 - **Full and Patch Bundle Updates**: Deliver both full updates and efficient patch updates by sending only the differences.
 - **Brotli Compression Support**: Utilize Brotli compression to optimize both full and patch bundles for even smaller sizes compared to the default deflate algorithm.
@@ -30,29 +30,31 @@ For platform-specific setup, follow the instructions below. It's recommended to 
 
 ## Usage
 
-The only thing left is to add the necessary code to your app to control the following policies:
+To integrate OTA updates seamlessly, follow these simple steps:
 
-1. When (and how often) to check for an update? (for example app start, in response to clicking a button in a settings page, periodically at some fixed interval)
+1. **Define Update Policies**: Decide when to check for updates ⎼ on app start, after a button press, or at a fixed interval.
 
-2. When an update is available, how to present it to the end user?
+2. **User Notification**: Determine how you'll inform users about updates.
 
-The simplest way to get started:
+### Quick Start
 
-* Wrap your root component with the `codePush`:
+Enhance your app effortlessly by wrapping the root component with `codePush`:
 
-  ```javascript
-  import codePush from "@d11/dota";
+```javascript
+import codePush from "@d11/dota";
 
-  function MyApp () {
-    ...
-  }
+function MyApp() {
+  // Your app code here
+}
 
-  export default codePush(MyApp);
-  ```
+export default codePush(MyApp);
+```
 
-By default, DOTA will check for updates on every app start. If an update is available, it will be silently downloaded, and installed the next time the app is restarted (either explicitly by the end user or by the OS), which ensures the least invasive experience for your end users. If an available update is mandatory, then it will be installed immediately, ensuring that the end user gets it as soon as possible.
+### Default Behavior
 
-If you would like your app to discover updates more quickly, you can refer to the [DOTA API reference](docs/api-js.md#dota) 
+By default, DOTA checks for updates each time the app starts. If available, updates are downloaded silently and applied on the next restart for a smooth user experience. Mandatory updates are applied immediately to ensure critical updates reach users without delay.
+
+For faster update discovery, refer to the [DOTA API reference](docs/api-js.md#dota).
 
 ## Creating the JavaScript bundle (Hermes)
 
