@@ -43,7 +43,7 @@ if [[ ! -z "${BASE_BUNDLE_PATH}" ]]; then
     echo "Using base bytecode flag: ${BASE_BUNDLE_PATH}"
     EXTRA_FLAGS="--base-bytecode ${BASE_BUNDLE_PATH}"
   else
-    echo "Error: Base bytecode file not found: ${BASE_BUNDLE_PATH}"
+    echo "Warning: Base bytecode file not found: ${BASE_BUNDLE_PATH}"
   fi
 fi
 
