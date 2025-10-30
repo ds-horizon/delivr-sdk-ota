@@ -1,17 +1,20 @@
 # React Native Module for OTA Updates
 
-Instantly deliver JS and asset updates to your React Native apps. Know more about [OTA Updates](docs/ota-updates.md)
-<!-- React Native Catalog -->
+Instantly deliver JS and asset updates to your React Native apps. Know more about [OTA Updates](docs/ota-updates.md).
+
+## Key Features
+
+- **Full and Patch Bundle Updates**: Deliver both full updates and efficient patch updates by sending only the differences.
+- **Brotli Compression Support**: Utilize Brotli compression to optimize both full and patch bundles for even smaller sizes compared to the default deflate algorithm.
+- **Base Bytecode Optimization**: Reduce patch bundle sizes significantly using the bytecode structure of your base bundle.
+- **Automated Bundle Handling**: Automatically manage bundles for both Android and iOS, ensuring seamless integration with the DOTA platform.
+- **Flexible Configuration**: Leverage CLI capabilities for custom configuration needs. See [Delivr CLI](https://github.com/ds-horizon/delivr-cli) for more details.
+- **Architecture Support**: Compatible with both old and new architecture setups.
 
 * [Getting Started](#getting-started)
 * [Usage](#usage)
 * [Creating the JavaScript bundle](#creating-the-javascript-bundle-hermes)
 * [Releasing Updates](#releasing-updates)
-* [Debugging](#debugging)
-* [Advanced Topics](#advanced-topics)
-* [API Reference](#api-reference)
-
-<!-- React Native Catalog -->
 
 ## Getting Started
 
