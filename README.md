@@ -5,7 +5,7 @@ Instantly deliver JS and asset updates to your React Native apps. Know more abou
 ## 🚀 Key Features
 
 - **Full and Patch Bundle Updates**: Deliver both full updates and efficient patch updates by sending only the differences.
-- **Brotli Compression Support**: Utilize Brotli compression to optimize both full and patch bundles for even smaller sizes compared to the default deflate algorithm.
+- **Brotli Compression Support**: Utilize [Brotli compression](https://github.com/ds-horizon/delivr-cli#release-management) to optimize both full and patch bundles for even smaller sizes compared to the default deflate algorithm.
 - **Base Bytecode Optimization**: Reduce patch bundle sizes significantly using the bytecode structure of your base bundle.
 - **Automated Bundle Handling**: Automatically manage bundles for both Android and iOS, ensuring seamless integration with the DOTA platform.
 - **Flexible Configuration**: Leverage CLI capabilities for custom configuration needs. See [Delivr CLI](https://github.com/ds-horizon/delivr-cli) for more details.
@@ -60,25 +60,22 @@ For more advanced configurations, consult the [DOTA API reference](docs/api-js.m
 
 ## Creating the JavaScript bundle (Hermes)
 
-There are two ways to generate the Hermes bundle for DOTA:
-
 ### 1. Automated Bundle Generation (Recommended)
 
-This method automatically copies the bundle that is generated during your app's build process, streamlining the integration with DOTA and Hermes.
+This method effortlessly integrates DOTA and Hermes by automatically using the bundle generated during your app's build process.
 
-#### For Android:
+#### Android Setup
 
-Add this line to your `android/app/build.gradle`:
+Add to `android/app/build.gradle`. This ensures the bundle is copied to the `.dota/android` directory for processing.
 
 ```gradle
 apply from: "../../node_modules/@d11/dota/android/codepush.gradle"
 ```
 
-This setup ensures that the bundle is automatically copied to the `.dota/android` directory for further processing.
+#### iOS Setup
 
-#### For iOS:
+In your `Podfile`, add:
 
-Add following in your `Podfile`:
 ```ruby
 # Import at top
 require_relative '../node_modules/@d11/dota/ios/scripts/dota_pod_helpers.rb'
@@ -90,11 +87,51 @@ end
 ```
 
 Run:
+
 ```bash
 cd ios && pod install
 ```
 
-#### Base Bytecode Optimization (New Feature)
+This ensures the bundle is copied to the `.dota/ios` directory for processing.
+
+### 2. Manual Bundle Generation
+
+Use this method if you need more control over the bundle generation process or need to generate bundles outside of the build process.
+
+```bash
+# For Android
+yarn dota bundle --platform android
+
+# For iOS
+yarn dota bundle --platform ios
+```
+
+#### CLI Options
+
+Customize with available options:
+
+```bash
+Options:
+  --platform <platform>      Specify platform: android or ios (required)
+  --bundle-path <path>      Directory to place the bundle in, default is .dota/<platform> (default: ".dota")
+  --assets-path <path>      Directory to place assets in, default is .dota/<platform> (default: ".dota")
+  --sourcemap-path <path>   Directory to place sourcemaps in, default is .dota/<platform> (default: ".dota")
+  --make-sourcemap         Generate sourcemap (default: false)
+  --entry-file <file>      Entry file (default: "index.ts")
+  --dev <boolean>          Development mode (default: "false")
+  --base-bundle-path <path> Path to base bundle for Hermes bytecode optimization
+  -h, --help              Display help for command
+
+# Example with options
+yarn dota bundle --platform android --bundle-path ./custom-path --make-sourcemap
+
+# Example with base bytecode optimization
+yarn dota bundle --platform android --base-bundle-path .dota/android/index.android.bundle
+
+Note: The base bundle path is used for Hermes bytecode optimization. If provided, the bundle will be compiled with the base bundle as reference, which can significantly reduce the size of patch bundles. For more details on creating optimized patches, see the [delivr-cli patch bundle documentation](https://github.com/ds-horizon/delivr-cli#patch-bundle-release).
+```
+
+### Base Bytecode Optimization (New Feature)
 
 DOTA provides full bundle and patch bundle updates (sending only diffs instead of full bundles). Refer to the [CLI documentation](https://github.com/ds-horizon/delivr-cli#patch-bundle-release) for patch creation and release process.
 
@@ -184,43 +221,6 @@ To enable this feature, you need to create and apply a patch for `react-native-x
   ```
 
 > Note: For your initial app release (base bundle), you don't need to set any path - the bundle will be automatically generated and copied to .dota/android. When creating CodePush updates later, you should set the path to this base bundle (from .dota/android) to enable the optimization.
-
-### 2. Manual Bundle Generation (Using CLI Tool)
-
-Use this method if you need more control over the bundle generation process or need to generate bundles outside of the build process.
-
-```bash
-# For Android
-yarn dota bundle --platform android
-
-# For iOS
-yarn dota bundle --platform ios
-```
-
-#### Available Options
-
-The CLI supports the following options:
-
-```bash
-Options:
-  --platform <platform>      Specify platform: android or ios (required)
-  --bundle-path <path>      Directory to place the bundle in, default is .dota/<platform> (default: ".dota")
-  --assets-path <path>      Directory to place assets in, default is .dota/<platform> (default: ".dota")
-  --sourcemap-path <path>   Directory to place sourcemaps in, default is .dota/<platform> (default: ".dota")
-  --make-sourcemap         Generate sourcemap (default: false)
-  --entry-file <file>      Entry file (default: "index.ts")
-  --dev <boolean>          Development mode (default: "false")
-  --base-bundle-path <path> Path to base bundle for Hermes bytecode optimization
-  -h, --help              Display help for command
-
-# Example with options
-yarn dota bundle --platform android --bundle-path ./custom-path --make-sourcemap
-
-# Example with base bytecode optimization
-yarn dota bundle --platform android --base-bundle-path .dota/android/index.android.bundle
-
-Note: The base bundle path is used for Hermes bytecode optimization. If provided, the bundle will be compiled with the base bundle as reference, which can significantly reduce the size of patch bundles. For more details on creating optimized patches, see the [delivr-cli patch bundle documentation](https://github.com/ds-horizon/delivr-cli#patch-bundle-release).
-```
 
 ## Releasing Updates
 
