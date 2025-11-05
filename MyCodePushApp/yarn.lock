@@ -1487,9 +1487,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@d11/dota@file:///Users/racharatna/Downloads/d11-delivr-react-native-ota-0.0.11.tgz::locator=MyCodePushApp%40workspace%3A.":
+"@d11/dota@file:///Users/harshavardhanithota/Documents/d11-delivr-react-native-ota-0.0.11.tgz::locator=MyCodePushApp%40workspace%3A.":
   version: 0.0.11
-  resolution: "@d11/dota@file:///Users/racharatna/Downloads/d11-delivr-react-native-ota-0.0.11.tgz#///Users/racharatna/Downloads/d11-delivr-react-native-ota-0.0.11.tgz::hash=796177&locator=MyCodePushApp%40workspace%3A."
+  resolution: "@d11/dota@file:///Users/harshavardhanithota/Documents/d11-delivr-react-native-ota-0.0.11.tgz#///Users/harshavardhanithota/Documents/d11-delivr-react-native-ota-0.0.11.tgz::hash=796177&locator=MyCodePushApp%40workspace%3A."
   dependencies:
     glob: "npm:^7.1.7"
     hoist-non-react-statics: "npm:^3.3.2"
@@ -2881,7 +2881,7 @@ __metadata:
     "@babel/preset-env": "npm:^7.25.3"
     "@babel/runtime": "npm:^7.25.0"
     "@d11/delivr-cli": "npm:^0.0.2"
-    "@d11/dota": "file:///Users/racharatna/Downloads/d11-delivr-react-native-ota-0.0.11.tgz"
+    "@d11/dota": "file:///Users/harshavardhanithota/Documents/d11-delivr-react-native-ota-0.0.11.tgz"
     "@react-native-community/cli": "npm:20.0.0"
     "@react-native-community/cli-platform-android": "npm:20.0.0"
     "@react-native-community/cli-platform-ios": "npm:20.0.0"

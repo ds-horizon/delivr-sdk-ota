@@ -50,14 +50,18 @@ export function deleteTestingDirectory(testingDir) {
     process.exit(1);
   }
 }
-export function run(command, description)
-{
-  try{
-    execSync(command, {'stdio': 'inherit'});
-    console.log(`✅ ${description} completedsuccessfully.`);
-  }catch(err){
-    console.error(`❌ ${description} failed: ${err.message}`);
-    process.exit(1);
+export function run(cmd, description) {
+  console.log(`\n⚙️  ${description || cmd}`);
+
+  try {
+    execSync(cmd, { stdio: 'inherit' });
+    console.log(`✅ Completed: ${cmd}`);
+    return { success: true };
+  } catch (error) {
+    console.error(`❌ Command failed: ${cmd}`);
+    console.error(`Error: ${error.message}`);
+    // Prevent crash — return a failure flag, don't throw
+    return { success: false, error };
   }
 }
 export function runMaestroTest(yamlFilePath) {

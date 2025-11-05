@@ -1,4 +1,5 @@
 import React from 'react';
+
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 
 import { NewAppScreen } from '@react-native/new-app-screen';
@@ -38,7 +39,6 @@ function AppContent() {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -48,6 +48,4 @@ const styles = StyleSheet.create({
 const env = 'staging';
 
 export default withCodePush(getCodePushConfig(env))(App);
-
-
 

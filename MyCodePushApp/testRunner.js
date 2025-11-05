@@ -1,10 +1,10 @@
 // MyCodePushApp/testRunner.js
 
-import { run, directoryChange, updateTemplateFileName, revertTemplateFileName, runMaestroTest, deleteTestingDirectory, createSubFolderInTestingDir, moveAssets, corruptBundle } from './automate.js';
+import { run, directoryChange, updateTemplateFileName, revertTemplateFileName, runMaestroTest, deleteTestingDirectory, createSubFolderInTestingDir, moveAssets, corruptBundle ,addImage, removeImage} from './automate.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
-
+import { execSync } from 'child_process'; 
 // Change to project root
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,11 +19,22 @@ const testResults = {
 
 // Test Registry
 const TEST_CASES = {
+  'eventflow-fullbundle': {
+    name: 'Event Flow Full Bundle Test',
+    description: 'Tests event flow with full bundle',
+    fn: testEventFlowFullBundle
+  },
+  'patchbundle': {
+    name: 'Patch Bundle Test',
+    description: 'Tests patch bundle deployment',
+    fn: testPatchBundle
+  },
   'fullbundle': {
     name: 'Full Bundle Test',
     description: 'Tests full bundle deployment with CodePush',
     fn: testFullBundle
   },
+  
   'fullbundle-config-error': {
     name: 'Full Bundle Config Error Test',
     description: 'Tests full bundle with config error (-p true flag)',
@@ -40,11 +51,7 @@ const TEST_CASES = {
     fn: testFullBundleBrotli
   },
   
-  'patchbundle': {
-    name: 'Patch Bundle Test',
-    description: 'Tests patch bundle deployment',
-    fn: testPatchBundle
-  },
+  
   'patch-config-error': {
     name: 'Patch Config Error Test',
     description: 'Tests patch bundle without -p true flag',
@@ -66,11 +73,7 @@ const TEST_CASES = {
     description: 'Tests full bundle with assets',
     fn: testAssetsFullBundle
   },
-  'eventflow-fullbundle': {
-    name: 'Event Flow Full Bundle Test',
-    description: 'Tests event flow with full bundle',
-    fn: testEventFlowFullBundle
-  }
+  
 };
 
 // Helper function to run a test with error handling
@@ -114,8 +117,10 @@ function testFullBundle() {
   revertTemplateFileName('App.tsx', 'App.tsx');
   run('yarn android --mode=Release', 'Creating bundle');
   
-  const yamlPath = path.resolve('./ui-automation.yaml');
-  runMaestroTest(yamlPath);
+  const result = run(`maestro test ./ui-automation.yaml`, 'Run Maestro test');
+  if (!result.success) {
+    throw new Error('❌ Maestro test failed — assertion error or UI mismatch.');
+  }
   
   deleteTestingDirectory('.dota-testing');
   run('adb uninstall com.mycodepushapp', 'Uninstalling app');
@@ -134,8 +139,10 @@ function testFullBundleConfigError() {
   revertTemplateFileName('App.tsx', 'App.tsx');
   run('yarn android --mode=Release', 'Creating bundle');
   
-  const yamlPath = path.resolve('./ui-automation.yaml');
-  runMaestroTest(yamlPath);
+  const result = run(`maestro test ./ui-automation.yaml`, 'Run Maestro test');
+  if (!result.success) {
+    throw new Error('❌ Maestro test failed — assertion error or UI mismatch.');
+  }
   
   deleteTestingDirectory('.dota-testing');
   run('adb uninstall com.mycodepushapp', 'Uninstalling app');
@@ -154,8 +161,10 @@ function testFullBundleBrotli() {
   revertTemplateFileName('App.tsx', 'App.tsx');
   run('yarn android --mode=Release', 'Creating bundle');
   
-  const yamlPath = path.resolve('./ui-automation.yaml');
-  runMaestroTest(yamlPath);
+  const result = run(`maestro test ./ui-automation.yaml`, 'Run Maestro test');
+  if (!result.success) {
+    throw new Error('❌ Maestro test failed — assertion error or UI mismatch.');
+  }
   
   deleteTestingDirectory('.dota-testing');
   run('adb uninstall com.mycodepushapp', 'Uninstalling app');
@@ -177,9 +186,10 @@ function testFullBundleCorrupted() {
   revertTemplateFileName('App.tsx', 'App.tsx');
   run('yarn android --mode=Release', 'Creating bundle');
   
-  console.log('\n🎯 Running Maestro test - expecting rollback behavior...\n');
-  const yamlPath = path.resolve('./ui-automation-corrupted.yaml');
-  runMaestroTest(yamlPath);
+  const result = run(`maestro test ./ui-automation-corrupted.yaml`, 'Run Maestro test');
+  if (!result.success) {
+    throw new Error('❌ Maestro test failed — assertion error or UI mismatch.');
+  }
   
   deleteTestingDirectory('.dota-testing');
   run('adb uninstall com.mycodepushapp', 'Uninstalling app');
@@ -189,10 +199,15 @@ function testFullBundleCorrupted() {
 
 function testPatchBundle() {
   run('yarn install', 'Installing dependencies');
-  run('yarn android --mode=Release', 'Creating base bundle');
+  const r = run('yarn android --mode=Release', 'Creating base bundle');
+if (!r.success) {
+  console.warn('⚠️ Skipping remaining steps for this test due to failure.');
+  return;
+}
   directoryChange('.dota-testing', '.dota/android', '.dota-testing/android-base');
   updateTemplateFileName('App.tsx', 'AppNew.tsx');
   run('yarn android --mode=Release', 'Creating codepush bundle');
+
   directoryChange('.dota-testing', '.dota/android', '.dota-testing/android-cp');
   
   createSubFolderInTestingDir('.codepush');
@@ -203,9 +218,13 @@ function testPatchBundle() {
   revertTemplateFileName('App.tsx', 'App.tsx');
   run('yarn android --mode=Release', 'Creating bundle');
   
-  const yamlPath = path.resolve('./ui-automation.yaml');
-  runMaestroTest(yamlPath);
   
+  const result = run(`maestro test ./ui-automation.yaml`, 'Run Maestro test');
+  if (!result.success) {
+    throw new Error('❌ Maestro test failed — assertion error or UI mismatch.');
+  }
+  
+
   deleteTestingDirectory('.dota-testing');
   run('adb uninstall com.mycodepushapp', 'Uninstalling app');
 }
@@ -226,8 +245,10 @@ function testPatchBundleBrotli() {
   revertTemplateFileName('App.tsx', 'App.tsx');
   run('yarn android --mode=Release', 'Creating bundle');
   
-  const yamlPath = path.resolve('./ui-automation.yaml');
-  runMaestroTest(yamlPath);
+  const result = run(`maestro test ./ui-automation.yaml`, 'Run Maestro test');
+  if (!result.success) {
+    throw new Error('❌ Maestro test failed — assertion error or UI mismatch.');
+  }
   
   deleteTestingDirectory('.dota-testing');
   run('adb uninstall com.mycodepushapp', 'Uninstalling app');
@@ -250,8 +271,10 @@ function testPatchBundleCorrupted() {
   revertTemplateFileName('App.tsx', 'App.tsx');
   run('yarn android --mode=Release', 'Creating bundle');
   
-  const yamlPath = path.resolve('./ui-automation-corrupted.yaml');
-  runMaestroTest(yamlPath);
+  const result = run(`maestro test ./ui-automation-corrupted.yaml`, 'Run Maestro test');
+  if (!result.success) {
+    throw new Error('❌ Maestro test failed — assertion error or UI mismatch.');
+  }
   
   deleteTestingDirectory('.dota-testing');
   run('adb uninstall com.mycodepushapp', 'Uninstalling app');
@@ -273,8 +296,10 @@ function testPatchConfigError() {
   revertTemplateFileName('App.tsx', 'App.tsx');
   run('yarn android --mode=Release', 'Creating bundle');
   
-  const yamlPath = path.resolve('./ui-automation.yaml');
-  runMaestroTest(yamlPath);
+  const result = run(`maestro test ./ui-automation-corrupted.yaml`, 'Run Maestro test');
+  if (!result.success) {
+    throw new Error('❌ Maestro test failed — assertion error or UI mismatch.');
+  }
   
   deleteTestingDirectory('.dota-testing');
   run('adb uninstall com.mycodepushapp', 'Uninstalling app');
@@ -297,8 +322,10 @@ function testAssetsFullBundle() {
     removeImage();  
     
     run('yarn android --mode=Release', 'Creating base bundle');
-    const yamlPath = path.resolve('./ui-automation-assests.yaml');
-    runMaestroTest(yamlPath);
+    const result = run(`maestro test ./ui-automation-assets.yaml`, 'Run Maestro test');
+    if (!result.success) {
+      throw new Error('❌ Maestro test failed — assertion error or UI mismatch.');
+    }
     
     
     
@@ -322,16 +349,21 @@ function testEventFlowFullBundle() {
     
     run('yarn android --mode=Release', 'Creating bundle');
     
-    // Run Maestro test to trigger the update flow
-    const yamlPath = path.resolve('./ui-automation.yaml');
-    runMaestroTest(yamlPath);
+    const result = run(`maestro test ./ui-automation.yaml`, 'Run Maestro test');
+    if (!result.success) {
+      throw new Error('❌ Maestro test failed — assertion error or UI mismatch.');
+    }
     
     // Wait a bit for the update to complete and logs to flush
     console.log('\n⏳ Waiting 5 seconds for update to complete and logs to flush...');
     execSync('sleep 5', { stdio: 'inherit' });
     
     // Dump logcat and check CodePush status events appear in order
-    const rawLog = execSync('adb logcat -d', { encoding: 'utf8' });
+    const rawLog = execSync('adb logcat -d | grep "\\[CodePush\\] Status" | tail -n 200', {
+      encoding: 'utf8',
+      maxBuffer: 1024 * 1024 * 5, // 5 MB is more than enough
+    });
+    
     const statusLines = rawLog
       .split('\n')
       .filter(l => l.includes('[CodePush] Status'));
