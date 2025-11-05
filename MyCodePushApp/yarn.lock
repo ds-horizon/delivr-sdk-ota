@@ -1449,9 +1449,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@d11/delivr-cli@npm:^0.0.2":
-  version: 0.0.2
-  resolution: "@d11/delivr-cli@npm:0.0.2"
+"@d11/delivr-cli@npm:0.0.5":
+  version: 0.0.5
+  resolution: "@d11/delivr-cli@npm:0.0.5"
   dependencies:
     backslash: "npm:^0.2.0"
     chalk: "npm:^4.1.2"
@@ -1483,7 +1483,7 @@ __metadata:
   bin:
     code-push-standalone: bin/script/cli.js
     codepush: bin/script/cli.js
-  checksum: 10c0/edea2664d5791fdf1cca0a9ca00f76abee3782e547bc3611d29eedf0d31f56a22635bd139831209d1f88462ce181efbb58911f96e10252651079f78cd021be14
+  checksum: 10c0/5a68e6dc4799c554cadde4dbaf465fa53f32027c60c4950eabe206550feb778076797454138fe60c58788449184a39c269e66e665f989236baa4183fe35b145a
   languageName: node
   linkType: hard
 
@@ -2880,7 +2880,7 @@ __metadata:
     "@babel/core": "npm:^7.25.2"
     "@babel/preset-env": "npm:^7.25.3"
     "@babel/runtime": "npm:^7.25.0"
-    "@d11/delivr-cli": "npm:^0.0.2"
+    "@d11/delivr-cli": "npm:0.0.5"
     "@d11/dota": "file:///Users/harshavardhanithota/Documents/d11-delivr-react-native-ota-0.0.11.tgz"
     "@react-native-community/cli": "npm:20.0.0"
     "@react-native-community/cli-platform-android": "npm:20.0.0"

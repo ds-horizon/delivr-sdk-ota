@@ -1,19 +1,70 @@
 {
-  "timestamp": "2025-11-05T08:26:46.147Z",
+  "timestamp": "2025-11-05T10:39:36.931Z",
   "summary": {
-    "total": 1,
-    "passed": 0,
-    "failed": 1,
+    "total": 10,
+    "passed": 4,
+    "failed": 6,
     "skipped": 0,
-    "passRate": "0.0%"
+    "passRate": "40.0%"
   },
   "results": {
-    "passed": [],
+    "passed": [
+      {
+        "name": "fullbundle-corrupted",
+        "displayName": "Full Bundle Corrupted Test",
+        "duration": "114.29"
+      },
+      {
+        "name": "patch-config-error",
+        "displayName": "Patch Config Error Test",
+        "duration": "107.04"
+      },
+      {
+        "name": "patchbundle-corrupted",
+        "displayName": "Patch Bundle Corrupted Test",
+        "duration": "115.25"
+      },
+      {
+        "name": "eventflow-fullbundle",
+        "displayName": "Event Flow Full Bundle Test",
+        "duration": "108.55"
+      }
+    ],
     "failed": [
       {
-        "name": "ios-fullbundle",
-        "displayName": "iOS Full Bundle Test",
-        "duration": "140.62",
+        "name": "fullbundle",
+        "displayName": "Full Bundle Test",
+        "duration": "100.08",
+        "error": "❌ Maestro test failed — assertion error or UI mismatch."
+      },
+      {
+        "name": "patchbundle",
+        "displayName": "Patch Bundle Test",
+        "duration": "119.08",
+        "error": "❌ Maestro test failed — assertion error or UI mismatch."
+      },
+      {
+        "name": "fullbundle-config-error",
+        "displayName": "Full Bundle Config Error Test",
+        "duration": "121.97",
+        "error": "❌ Maestro test failed — assertion error or UI mismatch."
+      },
+      {
+        "name": "fullbundle-brotli",
+        "displayName": "Full Bundle with Brotli",
+        "duration": "102.92",
+        "error": "❌ Maestro test failed — assertion error or UI mismatch."
+      },
+      {
+        "name": "patchbundle-brotli",
+        "displayName": "Patch Bundle with Brotli",
+        "duration": "962.40",
+        "error": "❌ Maestro test failed — assertion error or UI mismatch."
+      },
+      {
+        "name": "assets-fullbundle",
+        "displayName": "Assets Full Bundle Test",
+        "duration": "96.19",
         "error": "❌ Maestro test failed — assertion error or UI mismatch."
       }
     ],
