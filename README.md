@@ -72,18 +72,30 @@ Add to `android/app/build.gradle`. This ensures the bundle is copied to the `.do
 apply from: "../../node_modules/@d11/dota/android/codepush.gradle"
 ```
 
+To disable the default copying of the bundle, add the following in `gradle.properties`:
+
+```
+dotaCopyBundle=false
+```
+
 #### iOS Setup
 
 In your `Podfile`, add:
 
 ```ruby
-# Import at top
+# Import at the top
 require_relative '../node_modules/@d11/dota/ios/scripts/dota_pod_helpers.rb'
 
 # Include in the `post_install` block:
 post_install do |installer| 
   dota_post_install(installer, 'YourAppTarget', File.expand_path(__dir__))
 end
+```
+
+To disable the bundle copy process, set the environment variable in the `.xcode.env` file or directly in the CLI:
+
+```bash
+export DOTA_COPY_BUNDLE=false
 ```
 
 Run:
