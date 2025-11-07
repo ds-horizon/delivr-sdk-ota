@@ -1,0 +1,16 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "outDir": "scripts-dist",
+        "rootDir": "scripts"
+    },
+    "include": [
+        "scripts/postinstall.ts",
+        "scripts/delivr-cli/**/*.ts"
+    ],
+    "exclude": [
+        "test/**/*.ts",
+        "node_modules"
+    ]
+}
+

@@ -129,6 +129,7 @@ bin/
 
 # Generated files
 bin/
+scripts-dist/
 gen/
 
 # Gradle files

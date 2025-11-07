@@ -26,6 +26,8 @@ yarn add @d11/dota
 npm install @d11/dota
 ```
 
+> **Note:** The CLI tool (`@d11/delivr-cli`) is automatically included as a dev dependency when you install the SDK. This means you can use the CLI to deploy updates without installing it separately. However, if you prefer to use the CLI globally or in CI/CD pipelines, you can install it separately: `npm install -g @d11/delivr-cli` or `yarn global add @d11/delivr-cli`.
+
 As with all other React Native plugins, the integration experience is different for iOS and Android, so perform the following setup steps depending on which platform(s) you are targeting. Note, if you are targeting both platforms it is recommended to create separate DOTA applications for each platform through DOTA dashboard.
 
 Then continue with installing the native module
@@ -152,9 +154,11 @@ Before you start, generate your JS bundle and assets. See [Creating the JavaScri
 There are two ways to release OTA updates:
 
 ### 1. [Using CLI](https://github.com/ds-horizon/delivr-cli?tab=readme-ov-file#release-management)
+- **CLI is automatically included** when you install `@d11/dota` (as a dev dependency)
 - Ideal for local workflows and CI/CD pipelines
 - Supports [patch bundle release](https://github.com/ds-horizon/delivr-cli?tab=readme-ov-file#patch-bundle-release)
 - You can release, promote across deployments, and manage rollout percentages using CLI
+- Use via `npx @d11/delivr-cli` or install globally: `npm install -g @d11/delivr-cli`
 
 ### 2. [Using Web Panel](https://github.com/ds-horizon/delivr-web-panel)
 - Use the web UI to upload bundles, configure rollout percentage, and publish
