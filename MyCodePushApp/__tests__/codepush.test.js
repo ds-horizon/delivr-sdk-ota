@@ -20,7 +20,7 @@ const projectRoot = path.resolve(currentDir, '..');
 process.chdir(projectRoot);
 
 // Load ES module utilities dynamically
-const { loadAutomate } = require('./automate-loader');
+const { loadAutomate } = require('./module-loader');
 
 let run, directoryChange, updateTemplateFileName, revertTemplateFileName;
 let deleteTestingDirectory, createSubFolderInTestingDir, moveAssets;

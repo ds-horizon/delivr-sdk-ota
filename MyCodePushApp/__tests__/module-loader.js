@@ -15,7 +15,7 @@ async function loadAutomate() {
   }
   
   // Create a temporary script that loads automate.mjs and exports it
-  const tempScript = path.resolve(__dirname, 'temp-automate-loader.mjs');
+  const tempScript = path.resolve(__dirname, 'temp-module-loader.mjs');
   const automatePath = path.resolve(__dirname, 'automate.mjs').replace(/\\/g, '/');
   
   const scriptContent = `
