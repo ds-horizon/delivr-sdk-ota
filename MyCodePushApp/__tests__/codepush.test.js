@@ -25,6 +25,7 @@ const { loadAutomate } = require('./module-loader');
 let run, directoryChange, updateTemplateFileName, revertTemplateFileName;
 let deleteTestingDirectory, createSubFolderInTestingDir, moveAssets;
 let corruptBundle, addImage, removeImage;
+let originalContentCache;
 
 // Load utilities before tests run
 beforeAll(async () => {
@@ -52,6 +53,9 @@ beforeAll(async () => {
     addImage = moduleExports.addImage;
     removeImage = moduleExports.removeImage;
     
+    // Initialize the content cache Map
+    originalContentCache = new Map();
+    
     // Verify functions are loaded
     if (!run || typeof run !== 'function') {
       console.error('Available exports:', Object.keys(moduleExports));
@@ -77,7 +81,7 @@ describe('fullbundle', () => {
     // Always revert App.tsx to original state, even if test failed
     if (revertTemplateFileName) {
       try {
-        revertTemplateFileName('App.tsx', 'App.tsx');
+        revertTemplateFileName(originalContentCache, 'App.tsx', 'App.tsx');
       } catch (err) {
         console.warn('⚠️ Could not revert App.tsx:', err.message);
       }
@@ -103,7 +107,7 @@ describe('fullbundle', () => {
     directoryChange('.dota/android', '.dota-testing/android-base');
 
     // Update template file name for CodePush bundle
-    updateTemplateFileName('App.tsx', 'AppNew.tsx');
+    updateTemplateFileName(originalContentCache, 'App.tsx', 'AppNew.tsx');
 
     // Create CodePush bundle
     const cpResult = run('yarn android --mode=Release', 'Creating codepush bundle');
@@ -124,7 +128,7 @@ describe('fullbundle', () => {
     }
 
     // Revert template file name
-    revertTemplateFileName('App.tsx', 'App.tsx');
+    revertTemplateFileName(originalContentCache, 'App.tsx', 'App.tsx');
 
     // Create final bundle
     const finalResult = run('yarn android --mode=Release', 'Creating bundle');
@@ -145,7 +149,7 @@ describe('fullbundle', () => {
     directoryChange('.dota/android', '.dota-testing/android-base');
 
     // Update template file name
-    updateTemplateFileName('App.tsx', 'AppNew.tsx');
+    updateTemplateFileName(originalContentCache, 'App.tsx', 'AppNew.tsx');
 
     // Create CodePush bundle
     run('yarn android --mode=Release', 'Creating codepush bundle');
@@ -161,7 +165,7 @@ describe('fullbundle', () => {
     }
 
     // Revert template file name
-    revertTemplateFileName('App.tsx', 'App.tsx');
+    revertTemplateFileName(originalContentCache, 'App.tsx', 'App.tsx');
 
     // Create final bundle
     run('yarn android --mode=Release', 'Creating bundle');
@@ -179,7 +183,7 @@ describe('fullbundle', () => {
     directoryChange('.dota/android', '.dota-testing/android-base');
 
     // Update template file name
-    updateTemplateFileName('App.tsx', 'AppNew.tsx');
+    updateTemplateFileName(originalContentCache, 'App.tsx', 'AppNew.tsx');
 
     // Create CodePush bundle
     run('yarn android --mode=Release', 'Creating codepush bundle');
@@ -195,7 +199,7 @@ describe('fullbundle', () => {
     }
 
     // Revert template file name
-    revertTemplateFileName('App.tsx', 'App.tsx');
+    revertTemplateFileName(originalContentCache, 'App.tsx', 'App.tsx');
 
     // Create final bundle
     run('yarn android --mode=Release', 'Creating bundle');
@@ -213,7 +217,7 @@ describe('fullbundle', () => {
     directoryChange('.dota/android', '.dota-testing/android-base');
 
     // Update template file name
-    updateTemplateFileName('App.tsx', 'AppNew.tsx');
+    updateTemplateFileName(originalContentCache, 'App.tsx', 'AppNew.tsx');
 
     // Create CodePush bundle
     run('yarn android --mode=Release', 'Creating codepush bundle');
@@ -232,7 +236,7 @@ describe('fullbundle', () => {
     }
 
     // Revert template file name
-    revertTemplateFileName('App.tsx', 'App.tsx');
+    revertTemplateFileName(originalContentCache, 'App.tsx', 'App.tsx');
 
     // Create final bundle
     run('yarn android --mode=Release', 'Creating bundle');
@@ -253,7 +257,7 @@ describe('fullbundle', () => {
     directoryChange('.dota/android', '.dota-testing/android-base');
 
     // Update template file name
-    updateTemplateFileName('App.tsx', 'AppNew.tsx');
+    updateTemplateFileName(originalContentCache, 'App.tsx', 'AppNew.tsx');
 
     // Create CodePush bundle
     run('yarn android --mode=Release', 'Creating codepush bundle');
@@ -269,7 +273,7 @@ describe('fullbundle', () => {
     }
 
     // Revert template file name
-    revertTemplateFileName('App.tsx', 'App.tsx');
+    revertTemplateFileName(originalContentCache, 'App.tsx', 'App.tsx');
 
     // Create final bundle
     run('yarn android --mode=Release', 'Creating bundle');
@@ -366,7 +370,7 @@ describe('patchbundle', () => {
     // Always revert App.tsx to original state, even if test failed
     if (revertTemplateFileName) {
       try {
-        revertTemplateFileName('App.tsx', 'App.tsx');
+        revertTemplateFileName(originalContentCache, 'App.tsx', 'App.tsx');
       } catch (err) {
         console.warn('⚠️ Could not revert App.tsx:', err.message);
       }
@@ -393,7 +397,7 @@ describe('patchbundle', () => {
     directoryChange('.dota/android', '.dota-testing/android-base');
 
     // Update template file name
-    updateTemplateFileName('App.tsx', 'AppNew.tsx');
+    updateTemplateFileName(originalContentCache, 'App.tsx', 'AppNew.tsx');
 
     // Create CodePush bundle
     run('yarn android --mode=Release', 'Creating codepush bundle');
@@ -423,7 +427,7 @@ describe('patchbundle', () => {
     }
 
     // Revert template file name
-    revertTemplateFileName('App.tsx', 'App.tsx');
+    revertTemplateFileName(originalContentCache, 'App.tsx', 'App.tsx');
 
     // Create final bundle
     run('yarn android --mode=Release', 'Creating bundle');
@@ -441,7 +445,7 @@ describe('patchbundle', () => {
     directoryChange('.dota/android', '.dota-testing/android-base');
 
     // Update template file name
-    updateTemplateFileName('App.tsx', 'AppNew.tsx');
+    updateTemplateFileName(originalContentCache, 'App.tsx', 'AppNew.tsx');
 
     // Create CodePush bundle
     run('yarn android --mode=Release', 'Creating codepush bundle');
@@ -462,7 +466,7 @@ describe('patchbundle', () => {
     }
 
     // Revert template file name
-    revertTemplateFileName('App.tsx', 'App.tsx');
+    revertTemplateFileName(originalContentCache, 'App.tsx', 'App.tsx');
 
     // Create final bundle
     run('yarn android --mode=Release', 'Creating bundle');
@@ -480,7 +484,7 @@ describe('patchbundle', () => {
     directoryChange('.dota/android', '.dota-testing/android-base');
 
     // Update template file name
-    updateTemplateFileName('App.tsx', 'AppNew.tsx');
+    updateTemplateFileName(originalContentCache, 'App.tsx', 'AppNew.tsx');
 
     // Create CodePush bundle
     run('yarn android --mode=Release', 'Creating codepush bundle');
@@ -501,7 +505,7 @@ describe('patchbundle', () => {
     }
 
     // Revert template file name
-    revertTemplateFileName('App.tsx', 'App.tsx');
+    revertTemplateFileName(originalContentCache, 'App.tsx', 'App.tsx');
 
     // Create final bundle
     run('yarn android --mode=Release', 'Creating bundle');
@@ -565,7 +569,7 @@ describe('patchbundle', () => {
     directoryChange('.dota/android', '.dota-testing/android-base');
 
     // Update template file name
-    updateTemplateFileName('App.tsx', 'AppNew.tsx');
+    updateTemplateFileName(originalContentCache, 'App.tsx', 'AppNew.tsx');
 
     // Create CodePush bundle
     run('yarn android --mode=Release', 'Creating codepush bundle');
@@ -586,7 +590,7 @@ describe('patchbundle', () => {
     }
 
     // Revert template file name
-    revertTemplateFileName('App.tsx', 'App.tsx');
+    revertTemplateFileName(originalContentCache, 'App.tsx', 'App.tsx');
 
     // Create final bundle
     run('yarn android --mode=Release', 'Creating bundle');

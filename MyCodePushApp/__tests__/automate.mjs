@@ -85,10 +85,7 @@ export function runMaestroTest(yamlFilePath) {
 
 
 
-// Store original content for revert
-const originalContentCache = new Map();
-
-export function updateTemplateFileName(filePath, newTemplateName) {
+export function updateTemplateFileName(originalContentCache, filePath, newTemplateName) {
   // Resolve path relative to project root (go up one level from __tests__)
   const projectRoot = path.resolve(__dirname, '..');
   const resolvedFilePath = path.isAbsolute(filePath) ? filePath : path.resolve(projectRoot, filePath);
@@ -159,7 +156,7 @@ export function updateTemplateFileName(filePath, newTemplateName) {
   console.log(`✅ Updated ${resolvedFilePath} to show: "${updatedMessage}"`);
 }
 
-export function revertTemplateFileName(filePath, newTemplateName) {
+export function revertTemplateFileName(originalContentCache, filePath, newTemplateName) {
   // Resolve path relative to project root (go up one level from __tests__)
   const projectRoot = path.resolve(__dirname, '..');
   const resolvedFilePath = path.isAbsolute(filePath) ? filePath : path.resolve(projectRoot, filePath);
