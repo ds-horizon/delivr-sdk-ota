@@ -16,5 +16,11 @@ export {
   corruptBundle,
   addImage,
   removeImage,
+  setPlatform,
+  getCurrentPlatform,
+  ensureDeviceReady,
+  getPlatformName,
+  getBundleId,
+  runMaestroTest,
 } from './automate.mjs';
 

@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { execSync } from 'child_process';
 
 import { fileURLToPath } from 'url';
@@ -7,12 +8,153 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Platform configuration
+const PLATFORMS = {
+  android: {
+    bundleDir: '.dota/android',
+    bundleFile: 'index.android.bundle',
+    buildCommand: 'yarn android --mode=Release',
+    uninstallCommand: (appId) => `adb uninstall ${appId}`,
+    logcatCommand: 'adb logcat',
+    deviceCheck: () => {
+      try {
+        const result = execSync('adb devices', { encoding: 'utf8', stdio: 'pipe' });
+        return result.includes('device') && !result.includes('offline');
+      } catch {
+        return false;
+      }
+    },
+    getDeviceId: () => {
+      try {
+        const result = execSync('adb devices', { encoding: 'utf8', stdio: 'pipe' });
+        const lines = result.split('\n').filter(l => l.includes('device') && !l.includes('List'));
+        if (lines.length > 0) {
+          return lines[0].split('\t')[0];
+        }
+      } catch {}
+      return null;
+    }
+  },
+  ios: {
+    bundleDir: '.dota/ios',
+    bundleFile: 'main.jsbundle',
+    buildCommand: 'yarn ios --mode Release',
+    uninstallCommand: (appId) => {
+      const deviceId = getCurrentPlatform().getDeviceId();
+      return deviceId ? `xcrun simctl uninstall ${deviceId} ${appId}` : `xcrun simctl uninstall booted ${appId}`;
+    },
+    logcatCommand: 'xcrun simctl spawn booted log stream',
+    deviceCheck: () => {
+      try {
+        execSync('xcrun simctl list devices booted', { encoding: 'utf8', stdio: 'pipe' });
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    getDeviceId: () => {
+      try {
+        // Check for booted device first
+        const booted = execSync('xcrun simctl list devices booted', { encoding: 'utf8', stdio: 'pipe' });
+        const bootedMatch = booted.match(/\(([0-9A-F-]{36})\)/);
+        if (bootedMatch) return bootedMatch[1];
+        
+        // Fallback to available devices
+        const available = execSync('xcrun simctl list devices available', { encoding: 'utf8', stdio: 'pipe' });
+        const availableMatch = available.match(/iPhone[^(]*\(([0-9A-F-]{36})\)/);
+        if (availableMatch) return availableMatch[1];
+      } catch {}
+      return null;
+    },
+    bootSimulator: (deviceId) => {
+      try {
+        if (!deviceId) {
+          deviceId = getCurrentPlatform().getDeviceId();
+        }
+        if (deviceId) {
+          execSync(`xcrun simctl boot ${deviceId}`, { stdio: 'pipe' });
+          console.log(`✅ Booted iOS simulator: ${deviceId}`);
+        }
+      } catch (err) {
+        // Simulator might already be booted
+        console.log(`ℹ️ iOS simulator boot status: ${err.message}`);
+      }
+    }
+  }
+};
+
+// Current platform (defaults to android, can be set via setPlatform)
+let currentPlatform = process.env.TEST_PLATFORM || 'android';
+
+export function setPlatform(platform) {
+  if (!PLATFORMS[platform]) {
+    throw new Error(`Unsupported platform: ${platform}. Supported: ${Object.keys(PLATFORMS).join(', ')}`);
+  }
+  currentPlatform = platform;
+  console.log(`📱 Platform set to: ${platform}`);
+}
+
+export function getCurrentPlatform() {
+  return PLATFORMS[currentPlatform];
+}
+
+export function getPlatformName() {
+  return currentPlatform;
+}
+
+// Get platform-specific bundle ID
+export function getBundleId(platform = null) {
+  const targetPlatform = platform || currentPlatform;
+  const bundleIds = {
+    android: 'com.mycodepushapp',
+    ios: 'org.reactjs.native.example.MyCodePushApp'
+  };
+  return bundleIds[targetPlatform];
+}
+
+// Ensure emulator/simulator is ready
+export function ensureDeviceReady() {
+  const platform = getCurrentPlatform();
+  const platformName = currentPlatform;
+  
+  // Check if device is already ready
+  if (platform.deviceCheck()) {
+    console.log(`✅ ${platformName} device is ready`);
+    return true;
+  }
+  
+  console.log(`⚠️ No ${platformName} device detected. Attempting to boot...`);
+  
+  if (currentPlatform === 'ios' && platform.bootSimulator) {
+    // Try to boot iOS simulator
+    const deviceId = platform.getDeviceId();
+    if (deviceId) {
+      platform.bootSimulator(deviceId);
+      // Wait a bit for simulator to be ready
+      let attempts = 0;
+      while (attempts < 10 && !platform.deviceCheck()) {
+        execSync('sleep 2', { stdio: 'pipe' });
+        attempts++;
+      }
+    } else {
+      console.log('⚠️ No iOS simulator found. Please create one using: xcrun simctl list devices');
+    }
+  } else if (currentPlatform === 'android') {
+    console.log('⚠️ Please start an Android emulator manually');
+    console.log('   You can use: emulator -avd <AVD_NAME>');
+  }
+  
+  return platform.deviceCheck();
+}
+
 export function directoryChange(src, dest) {
   // Always resolve relative to project root (go up one level from __tests__)
   const projectRoot = path.resolve(__dirname, '..');
+  const platform = getCurrentPlatform();
   
-  const resolvedSrc = path.resolve(projectRoot, src);
-  const resolvedDest = path.resolve(projectRoot, dest);
+  // Replace platform-specific paths
+  const resolvedSrc = path.resolve(projectRoot, src.replace('{platform}', currentPlatform));
+  const resolvedDest = path.resolve(projectRoot, dest.replace('{platform}', currentPlatform));
   
   // Get destination parent directory
   const destParent = path.dirname(resolvedDest);
@@ -73,13 +215,127 @@ export function run(cmd, description) {
     return { success: false, error };
   }
 }
-export function runMaestroTest(yamlFilePath) {
+export function runMaestroTest(yamlFilePath, platform = null) {
+  const targetPlatform = platform || currentPlatform;
+  const deviceId = PLATFORMS[targetPlatform].getDeviceId();
+  const projectRoot = path.resolve(__dirname, '..');
+  
   try {
-    execSync(`maestro test ${yamlFilePath}`, { stdio: 'inherit' });
-    console.log('✅ Maestro flow completed successfully.');
+    // Resolve YAML file path relative to project root
+    const resolvedYamlPath = path.isAbsolute(yamlFilePath) 
+      ? yamlFilePath 
+      : path.resolve(projectRoot, yamlFilePath);
+    
+    // Read the YAML file and replace device field and appId with platform-specific values
+    let yamlContent = fs.readFileSync(resolvedYamlPath, 'utf8');
+    // Replace device line with the target platform
+    yamlContent = yamlContent.replace(/^device:\s*.+$/m, `device: ${targetPlatform}`);
+    // Replace appId with platform-specific bundle ID
+    const bundleId = getBundleId(targetPlatform);
+    yamlContent = yamlContent.replace(/^appId:\s*.+$/m, `appId: ${bundleId}`);
+    
+    // Create a temporary YAML file with platform-specific device
+    const tempYamlPath = path.join(
+      path.dirname(resolvedYamlPath),
+      `.temp-${path.basename(resolvedYamlPath, '.yaml')}-${targetPlatform}.yaml`
+    );
+    fs.writeFileSync(tempYamlPath, yamlContent);
+    
+    try {
+      // iOS: Only install app if it doesn't exist (preserve CodePush state)
+      if (targetPlatform === 'ios' && deviceId) {
+        const bundleId = getBundleId(targetPlatform);
+        
+        // Check if app is already installed
+        let appInstalled = false;
+        try {
+          const listResult = execSync(`xcrun simctl listapps ${deviceId}`, { 
+            encoding: 'utf8', 
+            stdio: 'pipe',
+            cwd: projectRoot
+          });
+          appInstalled = listResult.includes(bundleId);
+        } catch (err) {
+          appInstalled = false;
+        }
+        
+        // Only install if app doesn't exist
+        if (!appInstalled) {
+          // Find the built .app file
+          const derivedDataDir = path.join(os.homedir(), 'Library', 'Developer', 'Xcode', 'DerivedData');
+          let appToInstall = null;
+          
+          if (fs.existsSync(derivedDataDir)) {
+            const dirs = fs.readdirSync(derivedDataDir).filter(d => d.startsWith('MyCodePushApp-'));
+            for (const dir of dirs) {
+              const releasePath = path.join(derivedDataDir, dir, 'Build', 'Products', 'Release-iphonesimulator', 'MyCodePushApp.app');
+              if (fs.existsSync(releasePath)) {
+                appToInstall = releasePath;
+                break;
+              }
+              const debugPath = path.join(derivedDataDir, dir, 'Build', 'Products', 'Debug-iphonesimulator', 'MyCodePushApp.app');
+              if (fs.existsSync(debugPath)) {
+                appToInstall = debugPath;
+                break;
+              }
+            }
+          }
+          
+          if (appToInstall) {
+            console.log(`📱 Installing iOS app on simulator ${deviceId}...`);
+            try {
+              execSync(`xcrun simctl install ${deviceId} "${appToInstall}"`, { 
+                stdio: 'inherit',
+                cwd: projectRoot
+              });
+              console.log('✅ iOS app installed successfully');
+              execSync('sleep 2', { stdio: 'pipe' });
+            } catch (err) {
+              console.warn(`⚠️ Could not install iOS app: ${err.message}`);
+            }
+          }
+        }
+      }
+      
+      // Android: Ensure app is installed and ready before Maestro runs
+      if (targetPlatform === 'android') {
+        const bundleId = getBundleId(targetPlatform);
+        // Check if app is installed
+        try {
+          execSync(`adb shell pm list packages | grep ${bundleId}`, { 
+            encoding: 'utf8', 
+            stdio: 'pipe',
+            cwd: projectRoot
+          });
+          // App is installed, wait a moment for it to be fully ready
+          execSync('sleep 2', { stdio: 'pipe' });
+        } catch (err) {
+          // App not installed - this shouldn't happen as yarn android installs it
+          console.warn(`⚠️ Android app ${bundleId} not found. Maestro may fail.`);
+        }
+      }
+      
+      // Build maestro command
+      let maestroCmd = `maestro`;
+      if (deviceId && targetPlatform === 'ios') {
+        maestroCmd += ` --device ${deviceId}`;
+      }
+      maestroCmd += ` test ${tempYamlPath}`;
+      
+      execSync(maestroCmd, { 
+        stdio: 'inherit',
+        cwd: projectRoot
+      });
+      console.log(`✅ Maestro flow completed successfully for ${targetPlatform}.`);
+    } finally {
+      // Clean up temporary YAML file
+      if (fs.existsSync(tempYamlPath)) {
+        fs.unlinkSync(tempYamlPath);
+      }
+    }
   } catch (err) {
     console.error('❌ Maestro flow failed:', err.message);
-    process.exit(1);
+    throw err;
   }
 }
 
@@ -212,7 +468,15 @@ export function createSubFolderInTestingDir(subFolderName) {
 
 export function moveAssets(assetFolderName = 'drawable-mdpi') {
   const projectRoot = path.resolve(__dirname, '..');
-  const sourcePath = path.resolve(projectRoot, `.dota-testing/android-cp/${assetFolderName}`);
+  const platform = getCurrentPlatform();
+  
+  // For iOS, assets are in 'assets' folder (not Assets.xcassets)
+  // This matches the build script that copies assets to .dota/ios/assets
+  if (currentPlatform === 'ios') {
+    assetFolderName = 'assets';
+  }
+  
+  const sourcePath = path.resolve(projectRoot, `.dota-testing/${currentPlatform}-cp/${assetFolderName}`);
   const destinationBase = path.resolve(projectRoot, `.dota-testing/.codepush`);
   const destinationPath = path.resolve(destinationBase, assetFolderName);
 
@@ -220,6 +484,13 @@ export function moveAssets(assetFolderName = 'drawable-mdpi') {
     // Ensure source exists
     if (!fs.existsSync(sourcePath)) {
       console.warn(`⚠️ Source folder not found: ${sourcePath}`);
+      console.warn(`⚠️ Platform: ${currentPlatform}, Asset folder: ${assetFolderName}`);
+      // List what's actually in the cp directory for debugging
+      const cpDir = path.resolve(projectRoot, `.dota-testing/${currentPlatform}-cp`);
+      if (fs.existsSync(cpDir)) {
+        const contents = fs.readdirSync(cpDir);
+        console.warn(`⚠️ Contents of .dota-testing/${currentPlatform}-cp/: ${contents.join(', ')}`);
+      }
       return;
     }
 
@@ -237,6 +508,13 @@ export function moveAssets(assetFolderName = 'drawable-mdpi') {
     // Move the assets
     fs.renameSync(sourcePath, destinationPath);
     console.log(`✅ Moved assets from ${sourcePath} → ${destinationPath}`);
+    
+    // Verify assets were moved correctly (list files for debugging)
+    if (fs.existsSync(destinationPath)) {
+      const assetFiles = fs.readdirSync(destinationPath, { recursive: true });
+      const imageFiles = assetFiles.filter(f => /\.(png|jpg|jpeg)$/i.test(f));
+      console.log(`✅ Assets moved successfully. Found ${imageFiles.length} image file(s) in assets folder.`);
+    }
   } catch (err) {
     console.error(`❌ Failed to move assets: ${err.message}`);
     process.exit(1);

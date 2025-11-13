@@ -1,5 +1,7 @@
+# Platform-agnostic YAML - appId and device are replaced at runtime
+# Default values (will be replaced by runMaestroTest based on platform):
 appId: com.mycodepushapp
-device: android                  
+device: android
 
 ---
 - launchApp
